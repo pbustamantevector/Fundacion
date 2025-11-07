@@ -1,6 +1,6 @@
 streamlit
 pandas
+plotly
+numpy
 gspread
 google-auth
-matplotlib
-numpy
