@@ -1,9 +1,10 @@
 import streamlit as st
 import pandas as pd
+import numpy as np
+from scipy import stats
 import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
-from src.analysis import calcular_promedios_por_pregunta, analizar_significancia, analizar_clima_motivacion
 
 # Configuración de la página
 st.set_page_config(
@@ -15,16 +16,80 @@ st.set_page_config(
 # Título
 st.title("📊 Dashboard - Análisis de Metodología Cooperativa")
 
-# Cargar datos
-@st.cache_data
-def cargar_datos():
-    df = pd.read_csv("data/respuestas_encuesta.csv")
-    promedios = pd.read_csv("data/resultados_promedios.csv", index_col=0)
-    significancia = pd.read_csv("data/resultados_significancia.csv", index_col=0)
-    clima_motivacion = pd.read_csv("data/resultados_clima_motivacion.csv", index_col=0)
-    return df, promedios, significancia, clima_motivacion
+# Constantes para generación de datos
+N_ESTUDIANTES = 200
+N_PREGUNTAS_BASE = 20
+N_PREGUNTAS_EXTRA = 2
+PORCENTAJE_ESTUDIANTES_EXTRA = 0.20
 
-df, promedios, significancia, clima_motivacion = cargar_datos()
+def generar_datos_simulados():
+    """Genera datos simulados para el análisis"""
+    # Generar IDs de estudiantes
+    estudiantes = [f"EST_{str(i+1).zfill(3)}" for i in range(N_ESTUDIANTES)]
+    
+    # Determinar estudiantes con preguntas extra
+    n_estudiantes_extra = int(N_ESTUDIANTES * PORCENTAJE_ESTUDIANTES_EXTRA)
+    estudiantes_con_extra = np.random.choice(estudiantes, n_estudiantes_extra, replace=False)
+    
+    # Función para generar respuestas
+    def generar_respuestas(es_post=False):
+        base = np.random.normal(3.5, 0.8, N_PREGUNTAS_BASE)
+        if es_post:
+            mejora = np.random.normal(0.3, 0.2, N_PREGUNTAS_BASE)
+            base = base + mejora
+        return np.clip(np.round(base, 2), 1, 5)
+    
+    # Generar datos
+    datos = []
+    for tipo in ['PRE', 'POST']:
+        for estudiante in estudiantes:
+            respuestas = generar_respuestas(es_post=(tipo=='POST'))
+            row = {
+                'estudiante_id': estudiante,
+                'tipo_test': tipo,
+                'fecha': '2025-09-01' if tipo == 'PRE' else '2025-11-30'
+            }
+            # Añadir respuestas base
+            for i, resp in enumerate(respuestas, 1):
+                row[f'P{i}'] = resp
+                
+            # Añadir respuestas extra si corresponde
+            if estudiante in estudiantes_con_extra:
+                row['clima'] = round(np.random.normal(4, 0.5), 2)
+                row['motivacion'] = round(np.random.normal(4, 0.5), 2)
+                
+            datos.append(row)
+    
+    return pd.DataFrame(datos)
+
+# Generar o cargar datos
+@st.cache_data
+def obtener_datos():
+    """Genera datos y calcula estadísticas básicas"""
+    df = generar_datos_simulados()
+    
+    # Calcular promedios por pregunta
+    columnas_preguntas = [col for col in df.columns if col.startswith('P')]
+    promedios = df.groupby('tipo_test')[columnas_preguntas].mean()
+    
+    # Calcular significancia
+    significancia = {}
+    for pregunta in columnas_preguntas:
+        pre = df[df['tipo_test'] == 'PRE'][pregunta]
+        post = df[df['tipo_test'] == 'POST'][pregunta]
+        t_stat, p_value = stats.ttest_rel(pre, post)
+        significancia[pregunta] = {
+            'p_value': p_value,
+            'significativo': p_value < 0.05
+        }
+    
+    # Análisis clima y motivación
+    clima_mot = df[df['clima'].notna()].groupby('tipo_test')[['clima', 'motivacion']].mean()
+    
+    return df, promedios, pd.DataFrame(significancia).T, clima_mot
+
+# Cargar datos
+df, promedios, significancia, clima_motivacion = obtener_datos()
 
 # Sidebar
 st.sidebar.header("Filtros")
