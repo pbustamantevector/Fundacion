@@ -1,90 +1,63 @@
 import streamlit as st
 import pandas as pd
-import gspread
-from google.oauth2.service_account import Credentials
+import numpy as np
 import matplotlib.pyplot as plt
 
-# --------------------------------------------------------
-# CONFIGURACIÓN DE LA APP
-# --------------------------------------------------------
-st.set_page_config(page_title="Análisis Aprendizaje Cooperativo", layout="wide")
-st.title("📊 Análisis del Cuestionario de Aprendizaje Cooperativo")
-st.markdown(
-    "Visualización automática de resultados del formulario. "
-    "Los datos provienen directamente de Google Sheets y se actualizan en tiempo real."
-)
+# -------------------------------
+# DATOS DE EJEMPLO
+# -------------------------------
+# Supongamos que tenemos 10 preguntas del cuestionario
+preguntas = [f"P{i}" for i in range(1, 11)]
+promedios = np.random.uniform(3.0, 5.0, size=10).round(2)  # Promedios entre 3 y 5
+df = pd.DataFrame({"Pregunta": preguntas, "Promedio": promedios})
 
-# --------------------------------------------------------
-# CONFIGURACIÓN DE ACCESO A GOOGLE SHEETS
-# --------------------------------------------------------
-# 1️⃣  Crea una credencial de servicio en Google Cloud (JSON) y guárdala en el mismo repo.
-# 2️⃣  En Streamlit Cloud: Settings → Secrets → agrega el contenido del JSON en 'gcp_service_account'
-#      Ejemplo:  st.secrets["gcp_service_account"]
+# -------------------------------
+# CONFIG STREAMLIT
+# -------------------------------
+st.set_page_config(page_title="Ejemplo de Gráficos", layout="centered")
+st.title("🎨 Ejemplo de Visualizaciones con Streamlit + Matplotlib")
 
-SHEET_NAME = "Cuestionario Aprendizaje Cooperativo (Ampliado) (respuestas)"
+st.markdown("Datos simulados del cuestionario de aprendizaje cooperativo:")
 
-try:
-    credentials = Credentials.from_service_account_info(
-        st.secrets["gcp_service_account"],
-        scopes=[
-            "https://www.googleapis.com/auth/spreadsheets",
-            "https://www.googleapis.com/auth/drive",
-        ],
-    )
+st.dataframe(df, use_container_width=True)
 
-    gc = gspread.authorize(credentials)
-    spreadsheet = gc.open(SHEET_NAME)
-    worksheet = spreadsheet.sheet1
-    data = worksheet.get_all_records()
-    df = pd.DataFrame(data)
+# -------------------------------
+# GRÁFICO DE BARRAS
+# -------------------------------
+st.subheader("📊 Gráfico de barras")
+fig1, ax1 = plt.subplots()
+ax1.bar(df["Pregunta"], df["Promedio"], color="#4B9CD3")
+ax1.set_ylim(0, 5)
+ax1.set_ylabel("Promedio")
+ax1.set_title("Promedio por Pregunta (Barras)")
+st.pyplot(fig1)
 
-except Exception as e:
-    st.error(f"❌ No se pudo conectar con Google Sheets.\n\n**Detalle técnico:** {e}")
-    st.stop()
+# -------------------------------
+# GRÁFICO DE LÍNEA
+# -------------------------------
+st.subheader("📈 Gráfico de línea")
+fig2, ax2 = plt.subplots()
+ax2.plot(df["Pregunta"], df["Promedio"], marker="o", color="#E76F51")
+ax2.set_ylim(0, 5)
+ax2.set_ylabel("Promedio")
+ax2.set_title("Tendencia de Promedios (Línea)")
+st.pyplot(fig2)
 
-# --------------------------------------------------------
-# LIMPIEZA Y ANÁLISIS
-# --------------------------------------------------------
-if df.empty:
-    st.warning("No hay datos disponibles en el Google Sheet aún.")
-    st.stop()
+# -------------------------------
+# GRÁFICO RADAR
+# -------------------------------
+st.subheader("🌐 Gráfico radar (espacial)")
+# Convertimos los datos a coordenadas circulares
+N = len(df)
+valores = df["Promedio"].tolist()
+valores += valores[:1]  # cerrar el círculo
+angulos = np.linspace(0, 2 * np.pi, N, endpoint=False).tolist()
+angulos += angulos[:1]
 
-# Eliminar filas completamente vacías
-df = df.dropna(how="all")
-
-# Seleccionar solo columnas numéricas (las respuestas del cuestionario)
-df_num = df.select_dtypes(include="number")
-
-# Calcular promedios
-promedios = df_num.mean().round(2)
-promedio_total = round(promedios.mean(), 2)
-
-# --------------------------------------------------------
-# VISUALIZACIÓN
-# --------------------------------------------------------
-st.subheader("Promedio por Pregunta")
-
-fig, ax = plt.subplots(figsize=(10, 4))
-promedios.plot(kind="bar", ax=ax, color="#4B9CD3")
-ax.set_ylabel("Promedio")
-ax.set_xlabel("Pregunta")
-ax.set_title("Promedio de Puntaje por Pregunta")
-st.pyplot(fig)
-
-st.divider()
-
-col1, col2 = st.columns([2, 1])
-
-with col1:
-    st.subheader("Tabla de promedios")
-    st.dataframe(promedios.to_frame("Promedio"))
-
-with col2:
-    st.subheader("Promedio general del cuestionario")
-    st.metric(label="Promedio total", value=promedio_total)
-
-# --------------------------------------------------------
-# DESCARGA OPCIONAL
-# --------------------------------------------------------
-csv = df.to_csv(index=False).encode("utf-8")
-st.download_button("⬇️ Descargar datos (CSV)", csv, "respuestas_cuestionario.csv", "text/csv")
+fig3, ax3 = plt.subplots(subplot_kw={'projection': 'polar'})
+ax3.plot(angulos, valores, linewidth=2, linestyle='solid', color="#2A9D8F")
+ax3.fill(angulos, valores, color="#2A9D8F", alpha=0.4)
+ax3.set_thetagrids(np.degrees(angulos[:-1]), df["Pregunta"])
+ax3.set_ylim(0, 5)
+ax3.set_title("Promedio por Pregunta (Radar)")
+st.pyplot(fig3)
