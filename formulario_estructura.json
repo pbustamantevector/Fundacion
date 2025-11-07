@@ -1,0 +1,421 @@
+{
+  "titulo": "Cuestionario de Aprendizaje Cooperativo - Fundación Entre Pares",
+  "descripcion": "Este cuestionario evalúa los beneficios del uso de metodología cooperativa. Responde según tu experiencia en clases.",
+  "configuracion": {
+    "recopilar_email": false,
+    "permitir_edicion": false,
+    "confirmar_envio": true
+  },
+  "campos_identificacion": [
+    {
+      "pregunta": "Establecimiento",
+      "tipo": "texto_corto",
+      "requerido": true
+    },
+    {
+      "pregunta": "Curso",
+      "tipo": "texto_corto",
+      "requerido": true,
+      "descripcion": "Ejemplo: 5°A, 1° Medio B, etc."
+    },
+    {
+      "pregunta": "Nivel Educativo",
+      "tipo": "opcion_multiple",
+      "opciones": ["Básica", "Media"],
+      "requerido": true
+    },
+    {
+      "pregunta": "Tipo de Aplicación",
+      "tipo": "opcion_multiple",
+      "opciones": ["Pre test (Antes de metodología cooperativa)", "Post test (Después de metodología cooperativa)"],
+      "requerido": true
+    }
+  ],
+  "items_cuestionario": [
+    {
+      "codigo": "I1",
+      "pregunta": "Trabajamos la comunicación y la capacidad de escuchar",
+      "dimension": "Habilidades Sociales",
+      "tipo": "escala_likert",
+      "escala": {
+        "minimo": 1,
+        "maximo": 5,
+        "etiquetas": {
+          "1": "Nunca",
+          "2": "Casi nunca", 
+          "3": "A veces",
+          "4": "Casi siempre",
+          "5": "Siempre"
+        }
+      }
+    },
+    {
+      "codigo": "I2",
+      "pregunta": "Compartimos lo que estamos haciendo para que todo el grupo esté informado",
+      "dimension": "Habilidades Sociales",
+      "tipo": "escala_likert",
+      "escala": {
+        "minimo": 1,
+        "maximo": 5,
+        "etiquetas": {
+          "1": "Nunca",
+          "2": "Casi nunca",
+          "3": "A veces", 
+          "4": "Casi siempre",
+          "5": "Siempre"
+        }
+      }
+    },
+    {
+      "codigo": "I3",
+      "pregunta": "Es importante la ayuda de mis compañeros para completar las tareas",
+      "dimension": "Interdependencia Positiva",
+      "tipo": "escala_likert",
+      "escala": {
+        "minimo": 1,
+        "maximo": 5,
+        "etiquetas": {
+          "1": "Nunca",
+          "2": "Casi nunca",
+          "3": "A veces",
+          "4": "Casi siempre", 
+          "5": "Siempre"
+        }
+      }
+    },
+    {
+      "codigo": "I4",
+      "pregunta": "Los compañeros de grupo se relacionan e interactúan durante las tareas",
+      "dimension": "Interacción promotora",
+      "tipo": "escala_likert",
+      "escala": {
+        "minimo": 1,
+        "maximo": 5,
+        "etiquetas": {
+          "1": "Nunca",
+          "2": "Casi nunca",
+          "3": "A veces",
+          "4": "Casi siempre",
+          "5": "Siempre"
+        }
+      }
+    },
+    {
+      "codigo": "I5",
+      "pregunta": "Cada miembro del grupo debe participar en las tareas del grupo",
+      "dimension": "Responsabilidad Individual",
+      "tipo": "escala_likert",
+      "escala": {
+        "minimo": 1,
+        "maximo": 5,
+        "etiquetas": {
+          "1": "Nunca",
+          "2": "Casi nunca",
+          "3": "A veces",
+          "4": "Casi siempre",
+          "5": "Siempre"
+        }
+      }
+    },
+    {
+      "codigo": "I6",
+      "pregunta": "Decimos y defendemos ideas, conocimientos y puntos de vista ante los compañeros",
+      "dimension": "Interacción promotora",
+      "tipo": "escala_likert",
+      "escala": {
+        "minimo": 1,
+        "maximo": 5,
+        "etiquetas": {
+          "1": "Nunca",
+          "2": "Casi nunca",
+          "3": "A veces",
+          "4": "Casi siempre",
+          "5": "Siempre"
+        }
+      }
+    },
+    {
+      "codigo": "I7",
+      "pregunta": "Nos ponemos de acuerdo entre todos para tomar decisiones",
+      "dimension": "Habilidades Sociales",
+      "tipo": "escala_likert",
+      "escala": {
+        "minimo": 1,
+        "maximo": 5,
+        "etiquetas": {
+          "1": "Nunca",
+          "2": "Casi nunca",
+          "3": "A veces",
+          "4": "Casi siempre",
+          "5": "Siempre"
+        }
+      }
+    },
+    {
+      "codigo": "I8",
+      "pregunta": "No podemos terminar una actividad sin los aportes de los compañeros",
+      "dimension": "Interdependencia Positiva",
+      "tipo": "escala_likert",
+      "escala": {
+        "minimo": 1,
+        "maximo": 5,
+        "etiquetas": {
+          "1": "Nunca",
+          "2": "Casi nunca",
+          "3": "A veces",
+          "4": "Casi siempre",
+          "5": "Siempre"
+        }
+      }
+    },
+    {
+      "codigo": "I9",
+      "pregunta": "La interacción entre compañeros de grupo es necesaria para hacer la tarea", 
+      "dimension": "Interdependencia Positiva",
+      "tipo": "escala_likert",
+      "escala": {
+        "minimo": 1,
+        "maximo": 5,
+        "etiquetas": {
+          "1": "Nunca",
+          "2": "Casi nunca",
+          "3": "A veces",
+          "4": "Casi siempre",
+          "5": "Siempre"
+        }
+      }
+    },
+    {
+      "codigo": "I10",
+      "pregunta": "Cada miembro del grupo debe esforzarse en las actividades de grupo",
+      "dimension": "Responsabilidad Individual",
+      "tipo": "escala_likert",
+      "escala": {
+        "minimo": 1,
+        "maximo": 5,
+        "etiquetas": {
+          "1": "Nunca",
+          "2": "Casi nunca",
+          "3": "A veces",
+          "4": "Casi siempre",
+          "5": "Siempre"
+        }
+      }
+    },
+    {
+      "codigo": "I11",
+      "pregunta": "Escuchamos las opiniones y los puntos de vista de los compañeros",
+      "dimension": "Interacción promotora",
+      "tipo": "escala_likert",
+      "escala": {
+        "minimo": 1,
+        "maximo": 5,
+        "etiquetas": {
+          "1": "Nunca",
+          "2": "Casi nunca",
+          "3": "A veces",
+          "4": "Casi siempre",
+          "5": "Siempre"
+        }
+      }
+    },
+    {
+      "codigo": "I12",
+      "pregunta": "Debatimos las ideas entre los miembros del grupo",
+      "dimension": "Habilidades Sociales",
+      "tipo": "escala_likert",
+      "escala": {
+        "minimo": 1,
+        "maximo": 5,
+        "etiquetas": {
+          "1": "Nunca",
+          "2": "Casi nunca",
+          "3": "A veces",
+          "4": "Casi siempre",
+          "5": "Siempre"
+        }
+      }
+    },
+    {
+      "codigo": "I13",
+      "pregunta": "Es importante compartir materiales e información para hacer las tareas",
+      "dimension": "Interdependencia Positiva",
+      "tipo": "escala_likert",
+      "escala": {
+        "minimo": 1,
+        "maximo": 5,
+        "etiquetas": {
+          "1": "Nunca",
+          "2": "Casi nunca",
+          "3": "A veces",
+          "4": "Casi siempre",
+          "5": "Siempre"
+        }
+      }
+    },
+    {
+      "codigo": "I14",
+      "pregunta": "Nos relacionamos unos con otros para hacer las actividades",
+      "dimension": "Interacción promotora",
+      "tipo": "escala_likert",
+      "escala": {
+        "minimo": 1,
+        "maximo": 5,
+        "etiquetas": {
+          "1": "Nunca",
+          "2": "Casi nunca",
+          "3": "A veces",
+          "4": "Casi siempre",
+          "5": "Siempre"
+        }
+      }
+    },
+    {
+      "codigo": "I15",
+      "pregunta": "Cada miembro del grupo debe tratar de participar, aunque no le guste la tarea",
+      "dimension": "Responsabilidad Individual",
+      "tipo": "escala_likert",
+      "escala": {
+        "minimo": 1,
+        "maximo": 5,
+        "etiquetas": {
+          "1": "Nunca",
+          "2": "Casi nunca",
+          "3": "A veces",
+          "4": "Casi siempre",
+          "5": "Siempre"
+        }
+      }
+    },
+    {
+      "codigo": "I16",
+      "pregunta": "Llegamos a acuerdos ante opiniones diferentes o conflictos",
+      "dimension": "Habilidades Sociales",
+      "tipo": "escala_likert",
+      "escala": {
+        "minimo": 1,
+        "maximo": 5,
+        "etiquetas": {
+          "1": "Nunca",
+          "2": "Casi nunca",
+          "3": "A veces",
+          "4": "Casi siempre",
+          "5": "Siempre"
+        }
+      }
+    },
+    {
+      "codigo": "I17",
+      "pregunta": "Reflexionamos de manera individual y de manera conjunta dentro del grupo",
+      "dimension": "Procesamiento Grupal",
+      "tipo": "escala_likert",
+      "escala": {
+        "minimo": 1,
+        "maximo": 5,
+        "etiquetas": {
+          "1": "Nunca",
+          "2": "Casi nunca",
+          "3": "A veces",
+          "4": "Casi siempre",
+          "5": "Siempre"
+        }
+      }
+    },
+    {
+      "codigo": "I18",
+      "pregunta": "Si cada uno hace bien su parte, todo el grupo tiene un mejor resultado",
+      "dimension": "Interdependencia Positiva",
+      "tipo": "escala_likert",
+      "escala": {
+        "minimo": 1,
+        "maximo": 5,
+        "etiquetas": {
+          "1": "Nunca",
+          "2": "Casi nunca",
+          "3": "A veces",
+          "4": "Casi siempre",
+          "5": "Siempre"
+        }
+      }
+    },
+    {
+      "codigo": "I19",
+      "pregunta": "Trabajamos en conjunto unos con otros",
+      "dimension": "Interacción promotora",
+      "tipo": "escala_likert",
+      "escala": {
+        "minimo": 1,
+        "maximo": 5,
+        "etiquetas": {
+          "1": "Nunca",
+          "2": "Casi nunca",
+          "3": "A veces",
+          "4": "Casi siempre",
+          "5": "Siempre"
+        }
+      }
+    },
+    {
+      "codigo": "I20",
+      "pregunta": "Cada uno debe hacer su parte del trabajo para completar la tarea del grupo",
+      "dimension": "Responsabilidad Individual",
+      "tipo": "escala_likert",
+      "escala": {
+        "minimo": 1,
+        "maximo": 5,
+        "etiquetas": {
+          "1": "Nunca",
+          "2": "Casi nunca",
+          "3": "A veces",
+          "4": "Casi siempre",
+          "5": "Siempre"
+        }
+      }
+    },
+    {
+      "codigo": "I21",
+      "pregunta": "El clima de la clase favorece el trabajo cooperativo",
+      "dimension": "Clima Escolar",
+      "tipo": "escala_likert",
+      "aplicar_a": "20% aleatorio",
+      "escala": {
+        "minimo": 1,
+        "maximo": 5,
+        "etiquetas": {
+          "1": "Nunca",
+          "2": "Casi nunca",
+          "3": "A veces",
+          "4": "Casi siempre",
+          "5": "Siempre"
+        }
+      }
+    },
+    {
+      "codigo": "I22",
+      "pregunta": "Me siento motivado/a cuando trabajo en grupo",
+      "dimension": "Motivación",
+      "tipo": "escala_likert",
+      "aplicar_a": "20% aleatorio",
+      "escala": {
+        "minimo": 1,
+        "maximo": 5,
+        "etiquetas": {
+          "1": "Nunca",
+          "2": "Casi nunca",
+          "3": "A veces",
+          "4": "Casi siempre",
+          "5": "Siempre"
+        }
+      }
+    }
+  ],
+  "dimensiones": {
+    "Interdependencia Positiva": ["I3", "I8", "I9", "I13", "I18"],
+    "Responsabilidad Individual": ["I5", "I10", "I15", "I20"],
+    "Interacción promotora": ["I4", "I6", "I11", "I14", "I19"],
+    "Habilidades Sociales": ["I1", "I2", "I7", "I12", "I16"],
+    "Procesamiento Grupal": ["I17"],
+    "Clima Escolar": ["I21"],
+    "Motivación": ["I22"]
+  }
+}
