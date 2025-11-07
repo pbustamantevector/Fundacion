@@ -2,51 +2,36 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import plotly.express as px
-import gspread
-from google.oauth2.service_account import Credentials
 
 # --------------------------------------------------------
-# CONFIGURACIÓN DE LA APP
+# CONFIGURACIÓN GENERAL
 # --------------------------------------------------------
-st.set_page_config(page_title="Análisis Aprendizaje Cooperativo", layout="wide")
-st.title("📊 Dashboard Interactivo – Aprendizaje Cooperativo")
+st.set_page_config(page_title="Dashboard Aprendizaje Cooperativo", layout="wide")
+st.title("📊 Dashboard Interactivo – Aprendizaje Cooperativo (Datos Simulados)")
 
 st.markdown("""
-Este panel permite explorar los resultados del cuestionario con filtros dinámicos.
-Selecciona curso, establecimiento o rango de fechas para ver cómo cambian los promedios.
+Este panel muestra un ejemplo de análisis y visualización de resultados del cuestionario de aprendizaje cooperativo,
+usando **datos simulados**.  
+Luego, se puede conectar directamente al formulario de Google Sheets sin cambiar la lógica de análisis.
 """)
 
 # --------------------------------------------------------
-# FUENTE DE DATOS (reemplazar por tu Google Sheet si quieres)
+# GENERAR DATOS DE EJEMPLO
 # --------------------------------------------------------
-# 🔹 Si quieres probar con datos simulados:
 np.random.seed(42)
+
+n = 200  # cantidad de respuestas simuladas
 data = {
-    "Establecimiento": np.random.choice(["Escuela A", "Escuela B", "Escuela C"], 100),
-    "Curso": np.random.choice(["6°A", "7°B", "8°A", "8°B"], 100),
-    "Fecha": pd.date_range("2025-10-01", periods=100, freq="D"),
-    "P1": np.random.randint(1, 6, 100),
-    "P2": np.random.randint(1, 6, 100),
-    "P3": np.random.randint(1, 6, 100),
-    "P4": np.random.randint(1, 6, 100),
-    "P5": np.random.randint(1, 6, 100)
+    "Establecimiento": np.random.choice(["Escuela A", "Escuela B", "Escuela C"], n),
+    "Curso": np.random.choice(["6°A", "7°A", "8°A", "8°B"], n),
+    "Fecha": pd.date_range("2025-09-01", periods=n, freq="D"),
+    "P1": np.random.randint(1, 6, n),
+    "P2": np.random.randint(1, 6, n),
+    "P3": np.random.randint(1, 6, n),
+    "P4": np.random.randint(1, 6, n),
+    "P5": np.random.randint(1, 6, n),
 }
 df = pd.DataFrame(data)
-
-# 🔹 Si quieres conectar con Google Sheets, descomenta esto y configura tus credenciales:
-"""
-SHEET_NAME = "Cuestionario Aprendizaje Cooperativo (Ampliado) (respuestas)"
-credentials = Credentials.from_service_account_info(
-    st.secrets["gcp_service_account"],
-    scopes=[
-        "https://www.googleapis.com/auth/spreadsheets",
-        "https://www.googleapis.com/auth/drive",
-    ],
-)
-gc = gspread.authorize(credentials)
-worksheet = gc.open(SHEET_NAME).sheet1
-df = pd.DataFrame(worksheet.get_all_records())
-"""
 
 # --------------------------------------------------------
 # FILTROS INTERACTIVOS
@@ -59,61 +44,68 @@ fecha_min, fecha_max = df["Fecha"].min(), df["Fecha"].max()
 
 sel_establecimiento = st.sidebar.selectbox("Establecimiento", establecimientos)
 sel_curso = st.sidebar.selectbox("Curso", cursos)
-sel_fecha = st.sidebar.slider("Rango de fechas", fecha_min, fecha_max, (fecha_min, fecha_max))
+sel_fecha = st.sidebar.slider(
+    "Rango de fechas", fecha_min, fecha_max, (fecha_min, fecha_max)
+)
 
-# Aplicar filtros
-filtro = (df["Fecha"].between(sel_fecha[0], sel_fecha[1]))
+# aplicar filtros
+filtro = df["Fecha"].between(sel_fecha[0], sel_fecha[1])
 if sel_establecimiento != "Todos":
-    filtro &= (df["Establecimiento"] == sel_establecimiento)
+    filtro &= df["Establecimiento"] == sel_establecimiento
 if sel_curso != "Todos":
-    filtro &= (df["Curso"] == sel_curso)
+    filtro &= df["Curso"] == sel_curso
 
 df_filtrado = df[filtro]
 
-st.markdown(f"**Registros mostrados:** {len(df_filtrado)}")
+st.markdown(f"**Respuestas mostradas:** {len(df_filtrado)}")
 
 # --------------------------------------------------------
-# ANÁLISIS
+# CÁLCULO DE PROMEDIOS
 # --------------------------------------------------------
-cols_preguntas = [c for c in df_filtrado.columns if c.startswith("P")]
+cols_preguntas = [c for c in df.columns if c.startswith("P")]
 promedios = df_filtrado[cols_preguntas].mean().round(2)
+promedio_total = round(promedios.mean(), 2)
 
 # --------------------------------------------------------
-# VISUALIZACIÓN 1: Promedio por Pregunta (interactivo)
+# GRÁFICO 1 – Promedio por pregunta (barras interactivas)
 # --------------------------------------------------------
-st.subheader("Promedio por Pregunta")
+st.subheader("Promedio por pregunta")
 
 fig1 = px.bar(
     x=promedios.index,
     y=promedios.values,
-    labels={"x": "Pregunta", "y": "Promedio"},
-    title="Promedio de Puntaje por Pregunta",
+    title="Promedio por Pregunta",
     color=promedios.values,
+    labels={"x": "Pregunta", "y": "Promedio"},
     color_continuous_scale="Blues",
 )
+fig1.update_layout(yaxis_range=[0, 5])
 st.plotly_chart(fig1, use_container_width=True)
 
 # --------------------------------------------------------
-# VISUALIZACIÓN 2: Evolución temporal
+# GRÁFICO 2 – Evolución temporal
 # --------------------------------------------------------
 st.subheader("Evolución temporal del promedio general")
 
 df_filtrado["Promedio General"] = df_filtrado[cols_preguntas].mean(axis=1)
-prom_tiempo = df_filtrado.groupby("Fecha")["Promedio General"].mean().reset_index()
+prom_tiempo = (
+    df_filtrado.groupby("Fecha")["Promedio General"].mean().reset_index()
+)
 
 fig2 = px.line(
     prom_tiempo,
     x="Fecha",
     y="Promedio General",
-    title="Promedio general diario",
+    title="Promedio General Diario",
     markers=True,
 )
+fig2.update_layout(yaxis_range=[0, 5])
 st.plotly_chart(fig2, use_container_width=True)
 
 # --------------------------------------------------------
-# VISUALIZACIÓN 3: Comparación entre cursos
+# GRÁFICO 3 – Comparación entre cursos
 # --------------------------------------------------------
-st.subheader("Comparación de Promedio por Curso")
+st.subheader("Comparación de Promedio General por Curso")
 
 prom_curso = (
     df_filtrado.groupby("Curso")[cols_preguntas]
@@ -127,13 +119,22 @@ fig3 = px.bar(
     x="Curso",
     y="Promedio General",
     color="Promedio General",
+    title="Promedio General por Curso",
     color_continuous_scale="Viridis",
-    title="Promedio General por Curso"
 )
+fig3.update_layout(yaxis_range=[0, 5])
 st.plotly_chart(fig3, use_container_width=True)
 
 # --------------------------------------------------------
-# DESCARGA DE DATOS
+# TABLA Y DESCARGA
 # --------------------------------------------------------
+st.subheader("📋 Datos filtrados")
+st.dataframe(df_filtrado.head(20), use_container_width=True)
+
 csv = df_filtrado.to_csv(index=False).encode("utf-8")
-st.download_button("⬇️ Descargar datos filtrados (CSV)", csv, "datos_filtrados.csv", "text/csv")
+st.download_button(
+    "⬇️ Descargar datos filtrados (CSV)",
+    csv,
+    "datos_filtrados.csv",
+    "text/csv",
+)
