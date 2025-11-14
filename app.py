@@ -37,7 +37,7 @@ st.markdown(
 
 # Logo
 try:
-    st.image('LOGO_entrepares.png', width=200)
+    st.image('LOGO_entrepares.png', width=150)
 except:
     pass
 
