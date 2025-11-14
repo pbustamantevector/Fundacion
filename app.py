@@ -14,9 +14,49 @@ st.set_page_config(
     layout="wide"
 )
 
+# Estilo personalizado con color de fondo y logo
+st.markdown(
+    """
+    <style>
+    .stApp {
+        background-color: #edaf6b;
+    }
+    .main .block-container {
+        background-color: white;
+        padding: 2rem;
+        border-radius: 10px;
+        margin-top: 2rem;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
+# Logo
+try:
+    st.image('LOGO_entrepares.png', width=200)
+except:
+    pass
+
 # Estilo de gráficos
 sns.set_style('whitegrid')
-plt.rcParams['font.size'] = 10
+sns.set_palette('husl')
+plt.rcParams['figure.figsize'] = (12, 6)
+plt.rcParams['font.size'] = 11
+plt.rcParams['axes.titlesize'] = 13
+plt.rcParams['axes.titleweight'] = 'bold'
+plt.rcParams['axes.labelsize'] = 11
+plt.rcParams['xtick.labelsize'] = 10
+plt.rcParams['ytick.labelsize'] = 10
+plt.rcParams['legend.fontsize'] = 10
+plt.rcParams['figure.titlesize'] = 14
+
+# Paleta de colores personalizada
+COLOR_PRE = '#3498db'      # Azul suave
+COLOR_POST = '#e74c3c'     # Rojo coral
+COLOR_MEJORA = '#27ae60'   # Verde esmeralda
+COLOR_DISMINUYE = '#e67e22' # Naranja
+COLOR_NEUTRAL = '#95a5a6'  # Gris
 
 # Título principal
 st.title("📊 Análisis de Metodología de Aprendizaje Cooperativo")
@@ -35,7 +75,12 @@ Este análisis evalúa la efectividad de la metodología basada en 7 dimensiones
 # Cargar datos
 @st.cache_data
 def cargar_datos():
-    df = pd.read_excel('Base.xlsx')
+    # Leer datos desde Google Sheets
+    sheet_id = '1-K16AK3JmXJyJQhl_KVFJIkzG3PZ9fVL7i_lY5jCrrE'
+    sheet_name = 'Respuestas%20de%20formulario%201'  # URL encoded (espacios = %20)
+    url = f'https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sheet={sheet_name}'
+    
+    df = pd.read_csv(url)
     
     dimensiones = {
         'Habilidades sociales': [1, 6, 11, 16],
@@ -65,6 +110,7 @@ try:
     colegio_col = df.columns[2]
     momento_col = df.columns[1]
     id_col = df.columns[0]
+    nombre_col = '2. ¿Cuál es tu nombre?'  # Columna con el nombre del estudiante
     colegios = sorted(df[colegio_col].unique())
     
     st.success(f"✅ Datos cargados: {df.shape[0]} registros, {len(df_pre)} PRE, {len(df_post)} POST")
@@ -148,53 +194,77 @@ elif seccion == "2. Estadísticas Descriptivas":
     
     with tab1:
         fig, ax = plt.subplots(figsize=(12, 6))
+        fig.patch.set_facecolor('white')
         x = np.arange(len(dims))
         width = 0.35
-        ax.bar(x - width/2, stats_summary['Media PRE'], width, label='PRE', alpha=0.8, color='steelblue')
-        ax.bar(x + width/2, stats_summary['Media POST'], width, label='POST', alpha=0.8, color='coral')
-        ax.set_xlabel('Dimensiones')
-        ax.set_ylabel('Media')
-        ax.set_title('Comparación de Medias PRE vs POST (Total)', fontweight='bold')
+        ax.bar(x - width/2, stats_summary['Media PRE'], width, label='PRE', alpha=0.85, 
+               color=COLOR_PRE, edgecolor='white', linewidth=1.5)
+        ax.bar(x + width/2, stats_summary['Media POST'], width, label='POST', alpha=0.85, 
+               color=COLOR_POST, edgecolor='white', linewidth=1.5)
+        ax.set_xlabel('Dimensiones', fontweight='bold')
+        ax.set_ylabel('Media', fontweight='bold')
+        ax.set_title('Comparación de Medias PRE vs POST (Total)', fontweight='bold', pad=15)
         ax.set_xticks(x)
         ax.set_xticklabels(dims, rotation=45, ha='right')
-        ax.legend()
-        ax.grid(axis='y', alpha=0.3)
+        ax.legend(frameon=True, shadow=True, fancybox=True)
+        ax.grid(axis='y', alpha=0.3, linestyle='--')
         plt.tight_layout()
         st.pyplot(fig)
     
     with tab2:
         fig, ax = plt.subplots(figsize=(12, 6))
-        ax.bar(x - width/2, stats_summary['Mediana PRE'], width, label='PRE', alpha=0.8, color='steelblue')
-        ax.bar(x + width/2, stats_summary['Mediana POST'], width, label='POST', alpha=0.8, color='coral')
-        ax.set_xlabel('Dimensiones')
-        ax.set_ylabel('Mediana')
-        ax.set_title('Comparación de Medianas PRE vs POST (Total)', fontweight='bold')
+        fig.patch.set_facecolor('white')
+        ax.bar(x - width/2, stats_summary['Mediana PRE'], width, label='PRE', alpha=0.85, 
+               color=COLOR_PRE, edgecolor='white', linewidth=1.5)
+        ax.bar(x + width/2, stats_summary['Mediana POST'], width, label='POST', alpha=0.85, 
+               color=COLOR_POST, edgecolor='white', linewidth=1.5)
+        ax.set_xlabel('Dimensiones', fontweight='bold')
+        ax.set_ylabel('Mediana', fontweight='bold')
+        ax.set_title('Comparación de Medianas PRE vs POST (Total)', fontweight='bold', pad=15)
         ax.set_xticks(x)
         ax.set_xticklabels(dims, rotation=45, ha='right')
-        ax.legend()
-        ax.grid(axis='y', alpha=0.3)
+        ax.legend(frameon=True, shadow=True, fancybox=True)
+        ax.grid(axis='y', alpha=0.3, linestyle='--')
         plt.tight_layout()
         st.pyplot(fig)
     
     with tab3:
         fig, ax = plt.subplots(figsize=(10, 6))
-        colors = ['green' if x > 0 else 'red' for x in stats_summary['Cambio Media']]
-        ax.barh(stats_summary['Dimensión'], stats_summary['Cambio Media'], color=colors, alpha=0.7)
-        ax.axvline(x=0, color='black', linestyle='-', linewidth=0.8)
-        ax.set_xlabel('Cambio en Media (POST - PRE)')
-        ax.set_title('Cambio en Media por Dimensión (Total)', fontweight='bold')
-        ax.grid(axis='x', alpha=0.3)
+        fig.patch.set_facecolor('white')
+        colors = [COLOR_MEJORA if x > 0 else COLOR_DISMINUYE for x in stats_summary['Cambio Media']]
+        bars = ax.barh(stats_summary['Dimensión'], stats_summary['Cambio Media'], 
+                       color=colors, alpha=0.85, edgecolor='white', linewidth=1.5)
+        ax.axvline(x=0, color='#34495e', linestyle='-', linewidth=2, alpha=0.7)
+        ax.set_xlabel('Cambio en Media (POST - PRE)', fontweight='bold')
+        ax.set_title('Cambio en Media por Dimensión (Total)', fontweight='bold', pad=15)
+        ax.grid(axis='x', alpha=0.3, linestyle='--')
+        # Añadir valores en las barras
+        for bar in bars:
+            width_val = bar.get_width()
+            ax.text(width_val, bar.get_y() + bar.get_height()/2, 
+                    f'{width_val:.3f}', ha='left' if width_val > 0 else 'right', 
+                    va='center', fontweight='bold', fontsize=9, 
+                    bbox=dict(boxstyle='round,pad=0.3', facecolor='white', alpha=0.7, edgecolor='none'))
         plt.tight_layout()
         st.pyplot(fig)
     
     with tab4:
         fig, ax = plt.subplots(figsize=(10, 6))
-        colors = ['green' if x > 0 else 'red' for x in stats_summary['Cambio Mediana']]
-        ax.barh(stats_summary['Dimensión'], stats_summary['Cambio Mediana'], color=colors, alpha=0.7)
-        ax.axvline(x=0, color='black', linestyle='-', linewidth=0.8)
-        ax.set_xlabel('Cambio en Mediana (POST - PRE)')
-        ax.set_title('Cambio en Mediana por Dimensión (Total)', fontweight='bold')
-        ax.grid(axis='x', alpha=0.3)
+        fig.patch.set_facecolor('white')
+        colors = [COLOR_MEJORA if x > 0 else COLOR_DISMINUYE for x in stats_summary['Cambio Mediana']]
+        bars = ax.barh(stats_summary['Dimensión'], stats_summary['Cambio Mediana'], 
+                       color=colors, alpha=0.85, edgecolor='white', linewidth=1.5)
+        ax.axvline(x=0, color='#34495e', linestyle='-', linewidth=2, alpha=0.7)
+        ax.set_xlabel('Cambio en Mediana (POST - PRE)', fontweight='bold')
+        ax.set_title('Cambio en Mediana por Dimensión (Total)', fontweight='bold', pad=15)
+        ax.grid(axis='x', alpha=0.3, linestyle='--')
+        # Añadir valores en las barras
+        for bar in bars:
+            width_val = bar.get_width()
+            ax.text(width_val, bar.get_y() + bar.get_height()/2, 
+                    f'{width_val:.3f}', ha='left' if width_val > 0 else 'right', 
+                    va='center', fontweight='bold', fontsize=9, 
+                    bbox=dict(boxstyle='round,pad=0.3', facecolor='white', alpha=0.7, edgecolor='none'))
         plt.tight_layout()
         st.pyplot(fig)
     
@@ -234,28 +304,40 @@ elif seccion == "3. Cambios PRE vs POST":
     
     with col1:
         fig, ax = plt.subplots(figsize=(10, 6))
+        fig.patch.set_facecolor('white')
         x = np.arange(len(dims))
         width = 0.35
-        ax.bar(x - width/2, stats_summary['Media PRE'], width, label='PRE', alpha=0.8, color='steelblue')
-        ax.bar(x + width/2, stats_summary['Media POST'], width, label='POST', alpha=0.8, color='coral')
-        ax.set_xlabel('Dimensiones')
-        ax.set_ylabel('Puntaje Promedio')
-        ax.set_title('Comparación PRE vs POST')
+        ax.bar(x - width/2, stats_summary['Media PRE'], width, label='PRE', alpha=0.85, 
+               color=COLOR_PRE, edgecolor='white', linewidth=1.5)
+        ax.bar(x + width/2, stats_summary['Media POST'], width, label='POST', alpha=0.85, 
+               color=COLOR_POST, edgecolor='white', linewidth=1.5)
+        ax.set_xlabel('Dimensiones', fontweight='bold')
+        ax.set_ylabel('Puntaje Promedio', fontweight='bold')
+        ax.set_title('Comparación PRE vs POST', fontweight='bold', pad=15)
         ax.set_xticks(x)
         ax.set_xticklabels(dims, rotation=45, ha='right')
-        ax.legend()
-        ax.grid(axis='y', alpha=0.3)
+        ax.legend(frameon=True, shadow=True, fancybox=True)
+        ax.grid(axis='y', alpha=0.3, linestyle='--')
         plt.tight_layout()
         st.pyplot(fig)
     
     with col2:
         fig, ax = plt.subplots(figsize=(10, 6))
-        colors = ['green' if x > 0 else 'red' for x in stats_summary['Cambio']]
-        ax.barh(stats_summary['Dimensión'], stats_summary['Cambio'], color=colors, alpha=0.7)
-        ax.axvline(x=0, color='black', linestyle='-', linewidth=0.8)
-        ax.set_xlabel('Cambio (POST - PRE)')
-        ax.set_title('Mejoría/Disminución')
-        ax.grid(axis='x', alpha=0.3)
+        fig.patch.set_facecolor('white')
+        colors = [COLOR_MEJORA if x > 0 else COLOR_DISMINUYE for x in stats_summary['Cambio']]
+        bars = ax.barh(stats_summary['Dimensión'], stats_summary['Cambio'], 
+                       color=colors, alpha=0.85, edgecolor='white', linewidth=1.5)
+        ax.axvline(x=0, color='#34495e', linestyle='-', linewidth=2, alpha=0.7)
+        ax.set_xlabel('Cambio (POST - PRE)', fontweight='bold')
+        ax.set_title('Mejoría/Disminución', fontweight='bold', pad=15)
+        ax.grid(axis='x', alpha=0.3, linestyle='--')
+        # Añadir valores en las barras
+        for bar in bars:
+            width_val = bar.get_width()
+            ax.text(width_val, bar.get_y() + bar.get_height()/2, 
+                    f'{width_val:.3f}', ha='left' if width_val > 0 else 'right', 
+                    va='center', fontweight='bold', fontsize=9, 
+                    bbox=dict(boxstyle='round,pad=0.3', facecolor='white', alpha=0.7, edgecolor='none'))
         plt.tight_layout()
         st.pyplot(fig)
 
@@ -278,18 +360,24 @@ elif seccion == "4. Correlaciones":
     with col1:
         st.subheader("Correlaciones PRE")
         fig, ax = plt.subplots(figsize=(10, 8))
-        sns.heatmap(corr_pre, annot=True, fmt='.2f', cmap='coolwarm', center=0,
-                    square=True, ax=ax, cbar_kws={'shrink': 0.8}, vmin=-1, vmax=1)
-        ax.set_title('Correlaciones PRE', fontweight='bold')
+        fig.patch.set_facecolor('white')
+        sns.heatmap(corr_pre, annot=True, fmt='.2f', cmap='RdYlGn', center=0,
+                    square=True, ax=ax, cbar_kws={'shrink': 0.8, 'label': 'Correlación'}, 
+                    vmin=-1, vmax=1, linewidths=0.5, linecolor='white',
+                    annot_kws={'fontsize': 9, 'fontweight': 'bold'})
+        ax.set_title('Correlaciones PRE', fontsize=14, fontweight='bold', pad=15)
         plt.tight_layout()
         st.pyplot(fig)
     
     with col2:
         st.subheader("Correlaciones POST")
         fig, ax = plt.subplots(figsize=(10, 8))
-        sns.heatmap(corr_post, annot=True, fmt='.2f', cmap='coolwarm', center=0,
-                    square=True, ax=ax, cbar_kws={'shrink': 0.8}, vmin=-1, vmax=1)
-        ax.set_title('Correlaciones POST', fontweight='bold')
+        fig.patch.set_facecolor('white')
+        sns.heatmap(corr_post, annot=True, fmt='.2f', cmap='RdYlGn', center=0,
+                    square=True, ax=ax, cbar_kws={'shrink': 0.8, 'label': 'Correlación'}, 
+                    vmin=-1, vmax=1, linewidths=0.5, linecolor='white',
+                    annot_kws={'fontsize': 9, 'fontweight': 'bold'})
+        ax.set_title('Correlaciones POST', fontsize=14, fontweight='bold', pad=15)
         plt.tight_layout()
         st.pyplot(fig)
     
@@ -328,7 +416,7 @@ elif seccion == "4. Correlaciones":
 elif seccion == "5. Análisis por Estudiante":
     st.header("5️⃣ Estudiantes que Aumentan/Disminuyen por Dimensión")
     
-    df_paired = df_pre.merge(df_post, on=id_col, suffixes=('_pre', '_post'))
+    df_paired = df_pre.merge(df_post, on=nombre_col, suffixes=('_pre', '_post'), how='inner')
     
     cambios = []
     for dim in dims:
@@ -342,20 +430,24 @@ elif seccion == "5. Análisis por Estudiante":
     st.dataframe(df_cambios, use_container_width=True)
     
     fig, ax = plt.subplots(figsize=(12, 6))
+    fig.patch.set_facecolor('white')
     x = np.arange(len(df_cambios))
     width = 0.25
     
-    ax.bar(x - width, df_cambios['Aumentan'], width, label='Aumentan', color='green', alpha=0.7)
-    ax.bar(x, df_cambios['Disminuyen'], width, label='Disminuyen', color='red', alpha=0.7)
-    ax.bar(x + width, df_cambios['Igual'], width, label='Igual', color='gray', alpha=0.7)
+    ax.bar(x - width, df_cambios['Aumentan'], width, label='Aumentan', 
+           color=COLOR_MEJORA, alpha=0.85, edgecolor='white', linewidth=1.5)
+    ax.bar(x, df_cambios['Disminuyen'], width, label='Disminuyen', 
+           color=COLOR_DISMINUYE, alpha=0.85, edgecolor='white', linewidth=1.5)
+    ax.bar(x + width, df_cambios['Igual'], width, label='Igual', 
+           color=COLOR_NEUTRAL, alpha=0.85, edgecolor='white', linewidth=1.5)
     
-    ax.set_xlabel('Dimensiones')
-    ax.set_ylabel('Número de Estudiantes')
-    ax.set_title('Cambios en Puntaje por Dimensión')
+    ax.set_xlabel('Dimensiones', fontweight='bold')
+    ax.set_ylabel('Número de Estudiantes', fontweight='bold')
+    ax.set_title('Cambios en Puntaje por Dimensión', fontweight='bold', pad=15)
     ax.set_xticks(x)
     ax.set_xticklabels(df_cambios['Dimensión'], rotation=45, ha='right')
-    ax.legend()
-    ax.grid(axis='y', alpha=0.3)
+    ax.legend(frameon=True, shadow=True, fancybox=True)
+    ax.grid(axis='y', alpha=0.3, linestyle='--')
     plt.tight_layout()
     st.pyplot(fig)
 
@@ -419,12 +511,21 @@ elif seccion == "7. Ranking de Mejoras":
     st.dataframe(ranking, use_container_width=True)
     
     fig, ax = plt.subplots(figsize=(10, 6))
-    colors = ['green' if x > 0 else 'red' for x in ranking['Cambio']]
-    ax.barh(ranking['Dimensión'], ranking['Cambio'], color=colors, alpha=0.7)
-    ax.axvline(x=0, color='black', linestyle='-', linewidth=0.8)
-    ax.set_xlabel('Cambio (POST - PRE)')
-    ax.set_title('Ranking de Mejoras por Dimensión')
-    ax.grid(axis='x', alpha=0.3)
+    fig.patch.set_facecolor('white')
+    colors = [COLOR_MEJORA if x > 0 else COLOR_DISMINUYE for x in ranking['Cambio']]
+    bars = ax.barh(ranking['Dimensión'], ranking['Cambio'], 
+                   color=colors, alpha=0.85, edgecolor='white', linewidth=1.5)
+    ax.axvline(x=0, color='#34495e', linestyle='-', linewidth=2, alpha=0.7)
+    ax.set_xlabel('Cambio (POST - PRE)', fontweight='bold')
+    ax.set_title('Ranking de Mejoras por Dimensión', fontweight='bold', pad=15)
+    ax.grid(axis='x', alpha=0.3, linestyle='--')
+    # Añadir valores en las barras
+    for bar in bars:
+        width_val = bar.get_width()
+        ax.text(width_val, bar.get_y() + bar.get_height()/2, 
+                f'{width_val:.3f}', ha='left' if width_val > 0 else 'right', 
+                va='center', fontweight='bold', fontsize=9, 
+                bbox=dict(boxstyle='round,pad=0.3', facecolor='white', alpha=0.7, edgecolor='none'))
     plt.tight_layout()
     st.pyplot(fig)
 
@@ -629,10 +730,18 @@ elif seccion == "11. Resumen Ejecutivo":
     
     # Gráfico resumen
     fig, ax = plt.subplots(figsize=(10, 6))
-    ax.barh(df_mejoras['Dimensión'], df_mejoras['% Mejoran'], color='steelblue', alpha=0.7)
-    ax.set_xlabel('% de Estudiantes que Mejoran')
-    ax.set_title('Porcentaje de Mejora por Dimensión')
-    ax.grid(axis='x', alpha=0.3)
+    fig.patch.set_facecolor('white')
+    bars = ax.barh(df_mejoras['Dimensión'], df_mejoras['% Mejoran'], 
+                   color=COLOR_MEJORA, alpha=0.85, edgecolor='white', linewidth=1.5)
+    ax.set_xlabel('% de Estudiantes que Mejoran', fontweight='bold')
+    ax.set_title('Porcentaje de Mejora por Dimensión', fontweight='bold', pad=15)
+    ax.grid(axis='x', alpha=0.3, linestyle='--')
+    # Añadir valores en las barras
+    for bar in bars:
+        width_val = bar.get_width()
+        ax.text(width_val, bar.get_y() + bar.get_height()/2, 
+                f'{width_val:.1f}%', ha='left', va='center', fontweight='bold', fontsize=9, 
+                bbox=dict(boxstyle='round,pad=0.3', facecolor='white', alpha=0.7, edgecolor='none'))
     plt.tight_layout()
     st.pyplot(fig)
 
