@@ -11,7 +11,7 @@ warnings.filterwarnings('ignore')
 st.set_page_config(
     page_title="Análisis Metodología Aprendizaje Cooperativo",
     page_icon="📊",
-    layout="centered"
+    layout="wide"
 )
 
 # Estilo personalizado
@@ -45,7 +45,9 @@ except:
 # Estilo de gráficos
 sns.set_style('whitegrid')
 sns.set_palette('husl')
-plt.rcParams['figure.figsize'] = (10, 5)
+plt.rcParams['figure.figsize'] = (8, 4)
+plt.rcParams['figure.dpi'] = 100
+plt.rcParams['savefig.dpi'] = 100
 plt.rcParams['font.size'] = 9
 plt.rcParams['axes.titlesize'] = 11
 plt.rcParams['axes.titleweight'] = 'bold'
@@ -169,7 +171,7 @@ st.subheader("Gráficos Comparativos")
 tab1, tab2, tab3, tab4 = st.tabs(["Medias", "Medianas", "Cambio Media", "Cambio Mediana"])
 
 with tab1:
-    fig, ax = plt.subplots(figsize=(10, 4))
+    fig, ax = plt.subplots(figsize=(8, 3.5), dpi=100)
     fig.patch.set_facecolor('white')
     x = np.arange(len(dims))
     width = 0.35
@@ -188,7 +190,7 @@ with tab1:
     st.pyplot(fig)
 
 with tab2:
-    fig, ax = plt.subplots(figsize=(10, 4))
+    fig, ax = plt.subplots(figsize=(8, 3.5), dpi=100)
     fig.patch.set_facecolor('white')
     ax.bar(x - width/2, stats_summary['Mediana PRE'], width, label='PRE', alpha=0.85, 
            color=COLOR_PRE, edgecolor='white', linewidth=1.5)
@@ -205,7 +207,7 @@ with tab2:
     st.pyplot(fig)
 
 with tab3:
-    fig, ax = plt.subplots(figsize=(8, 4))
+    fig, ax = plt.subplots(figsize=(7, 3.5), dpi=100)
     fig.patch.set_facecolor('white')
     colors = [COLOR_MEJORA if x > 0 else COLOR_DISMINUYE for x in stats_summary['Cambio Media']]
     bars = ax.barh(stats_summary['Dimensión'], stats_summary['Cambio Media'], 
@@ -224,7 +226,7 @@ with tab3:
     st.pyplot(fig)
 
 with tab4:
-    fig, ax = plt.subplots(figsize=(8, 4))
+    fig, ax = plt.subplots(figsize=(7, 3.5), dpi=100)
     fig.patch.set_facecolor('white')
     colors = [COLOR_MEJORA if x > 0 else COLOR_DISMINUYE for x in stats_summary['Cambio Mediana']]
     bars = ax.barh(stats_summary['Dimensión'], stats_summary['Cambio Mediana'], 
@@ -250,7 +252,7 @@ st.header("Mejoría/Disminución por Dimensión")
 col1, col2 = st.columns(2)
 
 with col1:
-    fig, ax = plt.subplots(figsize=(8, 4))
+    fig, ax = plt.subplots(figsize=(7, 3.5), dpi=100)
     fig.patch.set_facecolor('white')
     x = np.arange(len(dims))
     width = 0.35
@@ -269,7 +271,7 @@ with col1:
     st.pyplot(fig)
 
 with col2:
-    fig, ax = plt.subplots(figsize=(8, 4))
+    fig, ax = plt.subplots(figsize=(7, 3.5), dpi=100)
     fig.patch.set_facecolor('white')
     colors = [COLOR_MEJORA if x > 0 else COLOR_DISMINUYE for x in stats_summary['Cambio Media']]
     bars = ax.barh(stats_summary['Dimensión'], stats_summary['Cambio Media'], 
@@ -306,7 +308,7 @@ col1, col2 = st.columns(2)
 
 with col1:
     st.subheader("Correlaciones PRE")
-    fig, ax = plt.subplots(figsize=(7, 6))
+    fig, ax = plt.subplots(figsize=(6, 5), dpi=100)
     fig.patch.set_facecolor('white')
     sns.heatmap(corr_pre, annot=True, fmt='.2f', cmap='RdYlGn', center=0,
                 square=True, ax=ax, cbar_kws={'shrink': 0.8, 'label': 'Correlación'}, 
@@ -318,7 +320,7 @@ with col1:
 
 with col2:
     st.subheader("Correlaciones POST")
-    fig, ax = plt.subplots(figsize=(7, 6))
+    fig, ax = plt.subplots(figsize=(6, 5), dpi=100)
     fig.patch.set_facecolor('white')
     sns.heatmap(corr_post, annot=True, fmt='.2f', cmap='RdYlGn', center=0,
                 square=True, ax=ax, cbar_kws={'shrink': 0.8, 'label': 'Correlación'}, 
@@ -346,7 +348,7 @@ df_cambios = pd.DataFrame(cambios)
 
 st.dataframe(df_cambios, use_container_width=True)
 
-fig, ax = plt.subplots(figsize=(10, 4))
+fig, ax = plt.subplots(figsize=(9, 3.5), dpi=100)
 fig.patch.set_facecolor('white')
 x = np.arange(len(df_cambios))
 width = 0.25
@@ -375,7 +377,7 @@ st.header("Distribución Boxplot por Colegio")
 
 dim_seleccionada = st.selectbox("Seleccionar dimensión:", dims)
 
-fig, ax = plt.subplots(figsize=(12, 5))
+fig, ax = plt.subplots(figsize=(10, 4), dpi=100)
 
 positions = []
 labels = []
@@ -421,7 +423,7 @@ ranking = ranking[['Ranking', 'Dimensión', 'Media PRE', 'Media POST', 'Cambio M
 
 st.dataframe(ranking, use_container_width=True)
 
-fig, ax = plt.subplots(figsize=(8, 4))
+fig, ax = plt.subplots(figsize=(7, 3.5), dpi=100)
 fig.patch.set_facecolor('white')
 colors = [COLOR_MEJORA if x > 0 else COLOR_DISMINUYE for x in ranking['Cambio Media']]
 bars = ax.barh(ranking['Dimensión'], ranking['Cambio Media'], 
@@ -466,7 +468,7 @@ for momento, df_temp in [('PRE', df_pre), ('POST', df_post)]:
 df_freq = pd.DataFrame(freq_summary)
 st.dataframe(df_freq, use_container_width=True)
 
-fig, axes = plt.subplots(1, 2, figsize=(12, 4))
+fig, axes = plt.subplots(1, 2, figsize=(11, 3.5), dpi=100)
 
 df_pre_freq = df_freq[df_freq['Momento'] == 'PRE']
 df_post_freq = df_freq[df_freq['Momento'] == 'POST']
