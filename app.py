@@ -45,7 +45,7 @@ except:
 # Estilo de gráficos
 sns.set_style('whitegrid')
 sns.set_palette('husl')
-plt.rcParams['figure.figsize'] = (12, 6)
+plt.rcParams['figure.figsize'] = (10, 5)
 plt.rcParams['figure.dpi'] = 100
 plt.rcParams['savefig.dpi'] = 100
 plt.rcParams['font.size'] = 11
@@ -171,7 +171,7 @@ st.subheader("Gráficos Comparativos")
 tab1, tab2, tab3, tab4 = st.tabs(["Medias", "Medianas", "Cambio Media", "Cambio Mediana"])
 
 with tab1:
-    fig, ax = plt.subplots(figsize=(12, 6), dpi=100)
+    fig, ax = plt.subplots(figsize=(10, 5), dpi=100)
     fig.patch.set_facecolor('white')
     x = np.arange(len(dims))
     width = 0.35
@@ -187,10 +187,10 @@ with tab1:
     ax.legend(frameon=True, shadow=True, fancybox=True)
     ax.grid(axis='y', alpha=0.3, linestyle='--')
     plt.tight_layout()
-    st.pyplot(fig)
+    st.pyplot(fig, use_container_width=False)
 
 with tab2:
-    fig, ax = plt.subplots(figsize=(12, 6), dpi=100)
+    fig, ax = plt.subplots(figsize=(10, 5), dpi=100)
     fig.patch.set_facecolor('white')
     ax.bar(x - width/2, stats_summary['Mediana PRE'], width, label='PRE', alpha=0.85, 
            color=COLOR_PRE, edgecolor='white', linewidth=1.5)
@@ -204,10 +204,10 @@ with tab2:
     ax.legend(frameon=True, shadow=True, fancybox=True)
     ax.grid(axis='y', alpha=0.3, linestyle='--')
     plt.tight_layout()
-    st.pyplot(fig)
+    st.pyplot(fig, use_container_width=False)
 
 with tab3:
-    fig, ax = plt.subplots(figsize=(10, 6), dpi=100)
+    fig, ax = plt.subplots(figsize=(9, 5), dpi=100)
     fig.patch.set_facecolor('white')
     colors = [COLOR_MEJORA if x > 0 else COLOR_DISMINUYE for x in stats_summary['Cambio Media']]
     bars = ax.barh(stats_summary['Dimensión'], stats_summary['Cambio Media'], 
@@ -223,10 +223,10 @@ with tab3:
                 va='center', fontweight='bold', fontsize=9, 
                 bbox=dict(boxstyle='round,pad=0.3', facecolor='white', alpha=0.7, edgecolor='none'))
     plt.tight_layout()
-    st.pyplot(fig)
+    st.pyplot(fig, use_container_width=False)
 
 with tab4:
-    fig, ax = plt.subplots(figsize=(10, 6), dpi=100)
+    fig, ax = plt.subplots(figsize=(9, 5), dpi=100)
     fig.patch.set_facecolor('white')
     colors = [COLOR_MEJORA if x > 0 else COLOR_DISMINUYE for x in stats_summary['Cambio Mediana']]
     bars = ax.barh(stats_summary['Dimensión'], stats_summary['Cambio Mediana'], 
@@ -252,7 +252,7 @@ st.header("Mejoría/Disminución por Dimensión")
 col1, col2 = st.columns(2)
 
 with col1:
-    fig, ax = plt.subplots(figsize=(10, 6), dpi=100)
+    fig, ax = plt.subplots(figsize=(9, 5), dpi=100)
     fig.patch.set_facecolor('white')
     x = np.arange(len(dims))
     width = 0.35
@@ -268,10 +268,10 @@ with col1:
     ax.legend(frameon=True, shadow=True, fancybox=True)
     ax.grid(axis='y', alpha=0.3, linestyle='--')
     plt.tight_layout()
-    st.pyplot(fig)
+    st.pyplot(fig, use_container_width=False)
 
 with col2:
-    fig, ax = plt.subplots(figsize=(10, 6), dpi=100)
+    fig, ax = plt.subplots(figsize=(9, 5), dpi=100)
     fig.patch.set_facecolor('white')
     colors = [COLOR_MEJORA if x > 0 else COLOR_DISMINUYE for x in stats_summary['Cambio Media']]
     bars = ax.barh(stats_summary['Dimensión'], stats_summary['Cambio Media'], 
@@ -308,7 +308,7 @@ col1, col2 = st.columns(2)
 
 with col1:
     st.subheader("Correlaciones PRE")
-    fig, ax = plt.subplots(figsize=(10, 8), dpi=100)
+    fig, ax = plt.subplots(figsize=(8, 6), dpi=100)
     fig.patch.set_facecolor('white')
     sns.heatmap(corr_pre, annot=True, fmt='.2f', cmap='RdYlGn', center=0,
                 square=True, ax=ax, cbar_kws={'shrink': 0.8, 'label': 'Correlación'}, 
@@ -320,7 +320,7 @@ with col1:
 
 with col2:
     st.subheader("Correlaciones POST")
-    fig, ax = plt.subplots(figsize=(10, 8), dpi=100)
+    fig, ax = plt.subplots(figsize=(8, 6), dpi=100)
     fig.patch.set_facecolor('white')
     sns.heatmap(corr_post, annot=True, fmt='.2f', cmap='RdYlGn', center=0,
                 square=True, ax=ax, cbar_kws={'shrink': 0.8, 'label': 'Correlación'}, 
@@ -348,7 +348,7 @@ df_cambios = pd.DataFrame(cambios)
 
 st.dataframe(df_cambios, use_container_width=True)
 
-fig, ax = plt.subplots(figsize=(12, 6), dpi=100)
+fig, ax = plt.subplots(figsize=(10, 5), dpi=100)
 fig.patch.set_facecolor('white')
 x = np.arange(len(df_cambios))
 width = 0.25
@@ -368,7 +368,7 @@ ax.set_xticklabels(df_cambios['Dimensión'], rotation=45, ha='right')
 ax.legend(frameon=True, shadow=True, fancybox=True)
 ax.grid(axis='y', alpha=0.3, linestyle='--')
 plt.tight_layout()
-st.pyplot(fig)
+st.pyplot(fig, use_container_width=False)
 
 st.markdown("---")
 
@@ -377,7 +377,7 @@ st.header("Distribución Boxplot por Colegio")
 
 dim_seleccionada = st.selectbox("Seleccionar dimensión:", dims)
 
-fig, ax = plt.subplots(figsize=(14, 6), dpi=100)
+fig, ax = plt.subplots(figsize=(12, 5), dpi=100)
 
 positions = []
 labels = []
@@ -410,7 +410,7 @@ ax.set_ylabel('Puntaje')
 ax.set_title(f'Distribución por Colegio: {dim_seleccionada}')
 ax.grid(axis='y', alpha=0.3)
 plt.tight_layout()
-st.pyplot(fig)
+st.pyplot(fig, use_container_width=False)
 
 st.markdown("---")
 
@@ -423,7 +423,7 @@ ranking = ranking[['Ranking', 'Dimensión', 'Media PRE', 'Media POST', 'Cambio M
 
 st.dataframe(ranking, use_container_width=True)
 
-fig, ax = plt.subplots(figsize=(10, 6), dpi=100)
+fig, ax = plt.subplots(figsize=(9, 5), dpi=100)
 fig.patch.set_facecolor('white')
 colors = [COLOR_MEJORA if x > 0 else COLOR_DISMINUYE for x in ranking['Cambio Media']]
 bars = ax.barh(ranking['Dimensión'], ranking['Cambio Media'], 
@@ -439,7 +439,7 @@ for bar in bars:
             va='center', fontweight='bold', fontsize=9, 
             bbox=dict(boxstyle='round,pad=0.3', facecolor='white', alpha=0.7, edgecolor='none'))
 plt.tight_layout()
-st.pyplot(fig)
+st.pyplot(fig, use_container_width=False)
 
 st.markdown("---")
 
@@ -468,7 +468,7 @@ for momento, df_temp in [('PRE', df_pre), ('POST', df_post)]:
 df_freq = pd.DataFrame(freq_summary)
 st.dataframe(df_freq, use_container_width=True)
 
-fig, axes = plt.subplots(1, 2, figsize=(14, 6), dpi=100)
+fig, axes = plt.subplots(1, 2, figsize=(12, 5), dpi=100)
 
 df_pre_freq = df_freq[df_freq['Momento'] == 'PRE']
 df_post_freq = df_freq[df_freq['Momento'] == 'POST']
@@ -495,7 +495,7 @@ axes[1].legend()
 axes[1].grid(axis='y', alpha=0.3)
 
 plt.tight_layout()
-st.pyplot(fig)
+st.pyplot(fig, use_container_width=False)
 
 # Footer
 st.markdown("---")
