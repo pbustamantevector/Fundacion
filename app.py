@@ -67,6 +67,13 @@ COLOR_NEUTRAL = '#95a5a6'  # Gris
 # Título principal
 st.title("Análisis de Metodología de Aprendizaje Cooperativo")
 
+# Botón para actualizar datos
+col_titulo, col_boton = st.columns([4, 1])
+with col_boton:
+    if st.button("🔄 Actualizar Datos", use_container_width=True):
+        st.cache_data.clear()
+        st.rerun()
+
 st.markdown("""
 Este análisis evalúa la efectividad de la metodología basada en 7 dimensiones:
 - **Habilidades sociales** (Preguntas 1, 6, 11, 16)
@@ -87,6 +94,9 @@ def cargar_datos():
     url = f'https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sheet={sheet_name}'
     
     df = pd.read_csv(url)
+    
+    import datetime
+    timestamp = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
     
     dimensiones = {
         'Habilidades sociales': [1, 6, 11, 16],
@@ -110,10 +120,10 @@ def cargar_datos():
     df_pre = df[df.iloc[:, 1] == 'No'].copy()
     df_post = df[df.iloc[:, 1] == 'Sí'].copy()
     
-    return df, df_pre, df_post, dimensiones, columnas_preguntas
+    return df, df_pre, df_post, dimensiones, columnas_preguntas, timestamp
 
 try:
-    df, df_pre, df_post, dimensiones, columnas_preguntas = cargar_datos()
+    df, df_pre, df_post, dimensiones, columnas_preguntas, timestamp = cargar_datos()
     dims = list(dimensiones.keys())
     colegio_col = df.columns[2]
     momento_col = df.columns[1]
@@ -121,7 +131,7 @@ try:
     nombre_col = '2. ¿Cuál es tu nombre?'
     colegios = sorted(df[colegio_col].unique())
     
-    st.success(f"✅ Datos cargados: {df.shape[0]} registros, {len(df_pre)} PRE, {len(df_post)} POST")
+    st.success(f"✅ Datos cargados: {df.shape[0]} registros, {len(df_pre)} PRE, {len(df_post)} POST | Última actualización: {timestamp}")
     
 except Exception as e:
     st.error(f"❌ Error al cargar datos: {e}")
