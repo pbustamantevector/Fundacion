@@ -21,6 +21,18 @@ st.markdown(
     .stApp {
         background-color: #edaf6b;
     }
+    [data-testid="stSidebar"] {
+        background-color: #4a5f7f;
+    }
+    [data-testid="stSidebar"] .stRadio label,
+    [data-testid="stSidebar"] .stCheckbox label,
+    [data-testid="stSidebar"] .stSelectbox label,
+    [data-testid="stSidebar"] p,
+    [data-testid="stSidebar"] h1,
+    [data-testid="stSidebar"] h2,
+    [data-testid="stSidebar"] h3 {
+        color: white !important;
+    }
     .main .block-container {
         background-color: white;
         padding: 2rem;
@@ -59,7 +71,7 @@ COLOR_DISMINUYE = '#e67e22' # Naranja
 COLOR_NEUTRAL = '#95a5a6'  # Gris
 
 # Título principal
-st.title("📊 Análisis de Metodología de Aprendizaje Cooperativo")
+st.title("Análisis de Metodología de Aprendizaje Cooperativo")
 
 st.markdown("""
 Este análisis evalúa la efectividad de la metodología basada en 7 dimensiones:
@@ -120,27 +132,27 @@ except Exception as e:
     st.stop()
 
 # Sidebar para navegación
-st.sidebar.title("📑 Navegación")
+st.sidebar.title("Navegación")
 seccion = st.sidebar.radio(
     "Seleccionar análisis:",
     [
-        "1. Resumen de Datos",
-        "2. Estadísticas Descriptivas",
-        "3. Cambios PRE vs POST",
-        "4. Correlaciones",
-        "5. Análisis por Estudiante",
-        "6. Distribución por Colegio",
-        "7. Ranking de Mejoras",
-        "8. Outliers",
-        "9. Frecuencias de Respuesta",
-        "10. Análisis de Regresión",
-        "11. Resumen Ejecutivo"
+        "Resumen de Datos",
+        "Estadísticas Descriptivas",
+        "Cambios PRE vs POST",
+        "Correlaciones",
+        "Análisis por Estudiante",
+        "Distribución por Colegio",
+        "Ranking de Mejoras",
+        "Outliers",
+        "Frecuencias de Respuesta",
+        "Análisis de Regresión",
+        "Resumen Ejecutivo"
     ]
 )
 
 # Filtros en sidebar
 st.sidebar.markdown("---")
-st.sidebar.subheader("🔍 Filtros")
+st.sidebar.subheader("Filtros")
 mostrar_por_colegio = st.sidebar.checkbox("Mostrar análisis por colegio", value=False)
 if mostrar_por_colegio:
     colegio_seleccionado = st.sidebar.selectbox("Seleccionar colegio:", ["Todos"] + list(colegios))
@@ -148,8 +160,8 @@ else:
     colegio_seleccionado = "Todos"
 
 # ==================== SECCIÓN 1: RESUMEN DE DATOS ====================
-if seccion == "1. Resumen de Datos":
-    st.header("1️⃣ Resumen de Datos")
+if seccion == "Resumen de Datos":
+    st.header("Resumen de Datos")
     
     col1, col2, col3, col4 = st.columns(4)
     with col1:
@@ -169,8 +181,8 @@ if seccion == "1. Resumen de Datos":
     st.write(f"Columnas de preguntas: {list(columnas_preguntas)}")
 
 # ==================== SECCIÓN 2: ESTADÍSTICAS DESCRIPTIVAS ====================
-elif seccion == "2. Estadísticas Descriptivas":
-    st.header("2️⃣ Estadísticas Descriptivas por Dimensión")
+elif seccion == "Estadísticas Descriptivas":
+    st.header("Estadísticas Descriptivas por Dimensión")
     
     # Resumen general
     stats_summary = pd.DataFrame({
@@ -186,11 +198,11 @@ elif seccion == "2. Estadísticas Descriptivas":
     stats_summary['Cambio Mediana'] = stats_summary['Mediana POST'] - stats_summary['Mediana PRE']
     stats_summary = stats_summary.round(3)
     
-    st.subheader("📊 Resumen General")
+    st.subheader("Resumen General")
     st.dataframe(stats_summary, use_container_width=True)
     
     # Gráficos
-    tab1, tab2, tab3, tab4 = st.tabs(["📈 Medias", "📊 Medianas", "📉 Cambio Media", "📉 Cambio Mediana"])
+    tab1, tab2, tab3, tab4 = st.tabs(["Medias", "Medianas", "Cambio Media", "Cambio Mediana"])
     
     with tab1:
         fig, ax = plt.subplots(figsize=(12, 6))
@@ -270,7 +282,7 @@ elif seccion == "2. Estadísticas Descriptivas":
     
     # Por colegio
     if mostrar_por_colegio and colegio_seleccionado != "Todos":
-        st.subheader(f"📊 Análisis para: {colegio_seleccionado}")
+        st.subheader(f"Análisis para: {colegio_seleccionado}")
         
         df_pre_col = df_pre[df_pre[colegio_col] == colegio_seleccionado]
         df_post_col = df_post[df_post[colegio_col] == colegio_seleccionado]
@@ -289,8 +301,8 @@ elif seccion == "2. Estadísticas Descriptivas":
         st.dataframe(stats_colegio, use_container_width=True)
 
 # ==================== SECCIÓN 3: CAMBIOS PRE VS POST ====================
-elif seccion == "3. Cambios PRE vs POST":
-    st.header("3️⃣ Mejoría/Disminución por Dimensión")
+elif seccion == "Cambios PRE vs POST":
+    st.header("Mejoría/Disminución por Dimensión")
     
     stats_summary = pd.DataFrame({
         'Dimensión': dims,
@@ -342,8 +354,8 @@ elif seccion == "3. Cambios PRE vs POST":
         st.pyplot(fig)
 
 # ==================== SECCIÓN 4: CORRELACIONES ====================
-elif seccion == "4. Correlaciones":
-    st.header("4️⃣ Correlación entre Dimensiones")
+elif seccion == "Correlaciones":
+    st.header("Correlación entre Dimensiones")
     
     st.markdown("""
     **Interpretación:**
@@ -382,7 +394,7 @@ elif seccion == "4. Correlaciones":
         st.pyplot(fig)
     
     # Análisis de cambios
-    st.subheader("📊 Cambios en Correlaciones")
+    st.subheader("Cambios en Correlaciones")
     
     cambios_corr = []
     for i, dim1 in enumerate(dims):
@@ -413,8 +425,8 @@ elif seccion == "4. Correlaciones":
         st.dataframe(df_cambios_corr.tail(5), use_container_width=True)
 
 # ==================== SECCIÓN 5: ANÁLISIS POR ESTUDIANTE ====================
-elif seccion == "5. Análisis por Estudiante":
-    st.header("5️⃣ Estudiantes que Aumentan/Disminuyen por Dimensión")
+elif seccion == "Análisis por Estudiante":
+    st.header("Estudiantes que Aumentan/Disminuyen por Dimensión")
     
     df_paired = df_pre.merge(df_post, on=nombre_col, suffixes=('_pre', '_post'), how='inner')
     
@@ -452,8 +464,8 @@ elif seccion == "5. Análisis por Estudiante":
     st.pyplot(fig)
 
 # ==================== SECCIÓN 6: DISTRIBUCIÓN POR COLEGIO ====================
-elif seccion == "6. Distribución por Colegio":
-    st.header("6️⃣ Distribución Boxplot por Colegio")
+elif seccion == "Distribución por Colegio":
+    st.header("Distribución Boxplot por Colegio")
     
     dim_seleccionada = st.selectbox("Seleccionar dimensión:", dims)
     
@@ -493,8 +505,8 @@ elif seccion == "6. Distribución por Colegio":
     st.pyplot(fig)
 
 # ==================== SECCIÓN 7: RANKING ====================
-elif seccion == "7. Ranking de Mejoras":
-    st.header("7️⃣ Ranking de Dimensiones con Mayor Mejora")
+elif seccion == "Ranking de Mejoras":
+    st.header("Ranking de Dimensiones con Mayor Mejora")
     
     stats_summary = pd.DataFrame({
         'Dimensión': dims,
@@ -530,8 +542,8 @@ elif seccion == "7. Ranking de Mejoras":
     st.pyplot(fig)
 
 # ==================== SECCIÓN 8: OUTLIERS ====================
-elif seccion == "8. Outliers":
-    st.header("8️⃣ Detección de Outliers")
+elif seccion == "Outliers":
+    st.header("Detección de Outliers")
     
     def detectar_outliers(data, columna):
         Q1 = data[columna].quantile(0.25)
@@ -557,9 +569,9 @@ elif seccion == "8. Outliers":
     df_outliers = pd.DataFrame(outliers_summary)
     st.dataframe(df_outliers, use_container_width=True)
 
-# ==================== SECCIÓN 9: FRECUENCIAS ====================
-elif seccion == "9. Frecuencias de Respuesta":
-    st.header("9️⃣ Frecuencias de Respuesta (Bajas 1-2 vs Altas 4-5)")
+# ====================  SECCIÓN 9: FRECUENCIAS ====================
+elif seccion == "Frecuencias de Respuesta":
+    st.header("Frecuencias de Respuesta (Bajas 1-2 vs Altas 4-5)")
     
     freq_summary = []
     
@@ -613,8 +625,8 @@ elif seccion == "9. Frecuencias de Respuesta":
     st.pyplot(fig)
 
 # ==================== SECCIÓN 10: REGRESIÓN ====================
-elif seccion == "10. Análisis de Regresión":
-    st.header("🔟 Análisis de Regresión: Predictores de Clima y Motivación")
+elif seccion == "Análisis de Regresión":
+    st.header("Análisis de Regresión: Predictores de Clima y Motivación")
     
     st.markdown("""
     **Interpretación del R²:**
@@ -676,13 +688,13 @@ elif seccion == "10. Análisis de Regresión":
     st.pyplot(fig)
     
     # Mejores predictores
-    st.subheader("🎯 Mejores Predictores")
+    st.subheader("Mejores Predictores")
     mejores = df_regresion.loc[df_regresion.groupby(['Momento', 'Variable_Dependiente'])['R²'].idxmax()]
     st.dataframe(mejores.sort_values(['Variable_Dependiente', 'Momento']), use_container_width=True)
 
 # ==================== SECCIÓN 11: RESUMEN EJECUTIVO ====================
-elif seccion == "11. Resumen Ejecutivo":
-    st.header("📋 Resumen Ejecutivo del Análisis")
+elif seccion == "Resumen Ejecutivo":
+    st.header("Resumen Ejecutivo del Análisis")
     
     # Calcular métricas
     stats_summary = pd.DataFrame({
@@ -697,7 +709,7 @@ elif seccion == "11. Resumen Ejecutivo":
     df_paired = df_pre.merge(df_post, on=id_col, suffixes=('_pre', '_post'))
     
     # Mostrar resumen
-    st.subheader("📊 Estadísticas Generales")
+    st.subheader("Estadísticas Generales")
     col1, col2, col3 = st.columns(3)
     with col1:
         st.metric("Total Estudiantes PRE", len(df_pre))
@@ -706,18 +718,18 @@ elif seccion == "11. Resumen Ejecutivo":
     with col3:
         st.metric("Colegios Evaluados", df[colegio_col].nunique())
     
-    st.subheader("🏆 Dimensión con Mayor Mejora")
+    st.subheader("Dimensión con Mayor Mejora")
     top_mejora = ranking.iloc[0]
     st.success(f"**{top_mejora['Dimensión']}**: +{top_mejora['Cambio']:.3f} puntos")
     
-    st.subheader("📉 Dimensión con Menor Cambio")
+    st.subheader("Dimensión con Menor Cambio")
     menor_mejora = ranking.iloc[-1]
     if menor_mejora['Cambio'] < 0:
         st.error(f"**{menor_mejora['Dimensión']}**: {menor_mejora['Cambio']:.3f} puntos")
     else:
         st.info(f"**{menor_mejora['Dimensión']}**: +{menor_mejora['Cambio']:.3f} puntos")
     
-    st.subheader("📈 Porcentaje de Estudiantes que Mejoran")
+    st.subheader("Porcentaje de Estudiantes que Mejoran")
     mejoras_por_dim = {}
     for dim in dims:
         pct = (df_paired[f'{dim}_post'] > df_paired[f'{dim}_pre']).sum() / len(df_paired) * 100
