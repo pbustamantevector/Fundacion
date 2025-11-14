@@ -11,7 +11,7 @@ warnings.filterwarnings('ignore')
 st.set_page_config(
     page_title="Análisis Metodología Aprendizaje Cooperativo",
     page_icon="📊",
-    layout="wide"
+    layout="centered"
 )
 
 # Estilo personalizado
@@ -26,6 +26,7 @@ st.markdown(
         background-color: black;
         padding: 2rem;
         color: white;
+        max-width: 1200px;
     }
     h1, h2, h3, h4, h5, h6, p, label, div {
         color: white !important;
