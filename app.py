@@ -153,7 +153,7 @@ except Exception as e:
 # ==================== FILTROS ====================
 st.header("🔍 Filtros de Datos")
 
-col1, col2, col3 = st.columns(3)
+col1, col2, col3, col4 = st.columns(4)
 
 with col1:
     colegios_sel = st.multiselect(
@@ -176,6 +176,13 @@ with col3:
         default=paralelos[:2] if len(paralelos) >= 2 else paralelos
     )
 
+with col4:
+    dimensiones_sel = st.multiselect(
+        "Seleccionar Dimensiones:",
+        options=dims,
+        default=[]
+    )
+
 # Aplicar filtros
 df_filtrado = df.copy()
 
@@ -188,12 +195,34 @@ if len(niveles_sel) > 0:
 if len(paralelos_sel) > 0:
     df_filtrado = df_filtrado[df_filtrado['3. Paralelo'].isin(paralelos_sel)]
 
+# Determinar qué columnas de puntaje usar según dimensiones seleccionadas
+if len(dimensiones_sel) > 0:
+    columnas_puntaje = [f'Puntaje_{dim}' for dim in dimensiones_sel]
+    label_puntaje = f"Puntaje Promedio ({', '.join(dimensiones_sel)})"
+else:
+    columnas_puntaje = ['Puntaje_Promedio']
+    label_puntaje = "Puntaje Promedio General"
+
+# Calcular puntaje según filtro de dimensiones
+if len(dimensiones_sel) > 0:
+    df_filtrado['Puntaje_Filtrado'] = df_filtrado[columnas_puntaje].mean(axis=1)
+else:
+    df_filtrado['Puntaje_Filtrado'] = df_filtrado['Puntaje_Promedio']
+
 st.markdown("---")
 
-# ==================== RESUMEN DE DATOS ====================
-st.header("📊 Resumen de Datos Filtrados")
+# ==cols_mostrar = ['1.  Selecciona tu colegio:', '2. ¿En qué nivel estás?', '3. Paralelo', 'Mes_Año', 'Puntaje_Filtrado']
+    if len(dimensiones_sel) > 0:
+        cols_mostrar.extend(columnas_puntaje)
+    st.dataframe(df_filtrado[cols_mostrar].head(20))
 
-col1, col2, col3, col4 = st.columns(4)
+# Mostrar dimensiones activas
+if len(dimensiones_sel) > 0:
+    st.info(f"📊 **Dimensiones activas:** {', '.join(dimensiones_sel)}")
+else:
+    st.info("📊 **Mostrando:** Promedio general de las 7 dimensiones"
+
+col1, col2, col3, col4 = st.columns(4)Filtrad
 with col1:
     st.metric("Total Registros", len(df_filtrado))
 with col2:
@@ -219,7 +248,7 @@ agrupado_curso = df_filtrado.groupby(['Colegio_Nivel_Paralelo', 'Mes_Año'])['Pu
     ('mean', 'mean'),
     ('std', 'std'),
     ('count', 'count')
-]).reset_index()
+]).reset_index()label_puntaje
 agrupado_curso.columns = ['Curso', 'Mes_Año', 'Promedio', 'Desv_Std', 'N_Estudiantes']
 agrupado_curso['Fecha_Plot'] = agrupado_curso['Mes_Año'].dt.to_timestamp()
 
@@ -270,7 +299,7 @@ st.header("📈 Evolución Temporal por Nivel")
 n_niveles = st.slider("Número de niveles a mostrar:", min_value=5, max_value=40, value=15, step=1)
 
 # Agrupar datos por nivel y mes
-agrupado_nivel = df_filtrado.groupby(['Colegio_Nivel', 'Mes_Año'])['Puntaje_Promedio'].agg([
+agrupado_nivel = df_filtrado.groupby(['Colegio_Nivel', 'Mes_Año'])['Puntaje_Filtrado'].agg([
     ('mean', 'mean'),
     ('std', 'std'),
     ('count', 'count')
@@ -296,7 +325,7 @@ for nivel in top_niveles:
                             alpha=0.15)
 
 axes[0].set_xlabel('Mes', fontweight='bold')
-axes[0].set_ylabel('Puntaje Promedio (1-5)', fontweight='bold')
+axes[0].set_ylabel(label_puntaje, fontweight='bold')
 axes[0].set_title(f'Evolución del Puntaje por Nivel (Top {len(top_niveles)})', fontweight='bold')
 axes[0].legend(bbox_to_anchor=(1.02, 1), loc='upper left', fontsize=8)
 axes[0].grid(True, alpha=0.3)
@@ -323,7 +352,7 @@ st.markdown("---")
 st.header("📋 Resumen Estadístico por Curso")
 
 # Resumen general por curso
-resumen_curso = df_filtrado.groupby('Colegio_Nivel_Paralelo')['Puntaje_Promedio'].agg([
+resumen_curso = df_filtrado.groupby('Colegio_Nivel_Paralelo')['Puntaje_Filtrado'].agg([
     ('N_Estudiantes', 'count'),
     ('Promedio_General', 'mean'),
     ('Desv_Std', 'std'),
@@ -336,7 +365,7 @@ st.dataframe(resumen_curso.head(20), use_container_width=True)
 # Tabla pivote: Promedio por mes
 st.subheader("📊 Promedios Mensuales por Curso")
 
-resumen_curso_mes = df_filtrado.groupby(['Colegio_Nivel_Paralelo', 'Mes_Año'])['Puntaje_Promedio'].agg([
+resumen_curso_mes = df_filtrado.groupby(['Colegio_Nivel_Paralelo', 'Mes_Año'])['Puntaje_Filtrado'].agg([
     ('Promedio', 'mean'),
     ('N_Estudiantes', 'count')
 ]).round(2).reset_index()
@@ -348,7 +377,7 @@ tabla_promedio_curso = resumen_curso_mes.pivot(
 ).round(2)
 
 # Agregar columnas de totales
-tabla_promedio_curso['Promedio_General'] = df_filtrado.groupby('Colegio_Nivel_Paralelo')['Puntaje_Promedio'].mean().round(2)
+tabla_promedio_curso['Promedio_General'] = df_filtrado.groupby('Colegio_Nivel_Paralelo')['Puntaje_Filtrado'].mean().round(2)
 tabla_promedio_curso = tabla_promedio_curso.sort_values('Promedio_General', ascending=False)
 
 st.dataframe(tabla_promedio_curso.head(20), use_container_width=True)
@@ -359,7 +388,7 @@ st.markdown("---")
 st.header("📋 Resumen Estadístico por Nivel")
 
 # Resumen general por nivel
-resumen_nivel = df_filtrado.groupby('Colegio_Nivel')['Puntaje_Promedio'].agg([
+resumen_nivel = df_filtrado.groupby('Colegio_Nivel')['Puntaje_Filtrado'].agg([
     ('N_Estudiantes', 'count'),
     ('Promedio_General', 'mean'),
     ('Desv_Std', 'std'),
@@ -372,7 +401,7 @@ st.dataframe(resumen_nivel.head(20), use_container_width=True)
 # Tabla pivote: Promedio por mes
 st.subheader("📊 Promedios Mensuales por Nivel")
 
-resumen_nivel_mes = df_filtrado.groupby(['Colegio_Nivel', 'Mes_Año'])['Puntaje_Promedio'].agg([
+resumen_nivel_mes = df_filtrado.groupby(['Colegio_Nivel', 'Mes_Año'])['Puntaje_Filtrado'].agg([
     ('Promedio', 'mean'),
     ('N_Estudiantes', 'count')
 ]).round(2).reset_index()
@@ -384,7 +413,7 @@ tabla_promedio_nivel = resumen_nivel_mes.pivot(
 ).round(2)
 
 # Agregar columnas de totales
-tabla_promedio_nivel['Promedio_General'] = df_filtrado.groupby('Colegio_Nivel')['Puntaje_Promedio'].mean().round(2)
+tabla_promedio_nivel['Promedio_General'] = df_filtrado.groupby('Colegio_Nivel')['Puntaje_Filtrado'].mean().round(2)
 tabla_promedio_nivel = tabla_promedio_nivel.sort_values('Promedio_General', ascending=False)
 
 st.dataframe(tabla_promedio_nivel.head(20), use_container_width=True)
@@ -442,12 +471,12 @@ st.markdown("Análisis de regresión lineal para identificar tendencias de mejor
 
 # Preparar datos para regresión
 df_reg = df_filtrado.copy()
-df_reg = df_reg[df_reg['Fecha'].notna() & df_reg['Puntaje_Promedio'].notna()]
+df_reg = df_reg[df_reg['Fecha'].notna() & df_reg['Puntaje_Filtrado'].notna()]
 df_reg['Dias_Desde_Inicio'] = (df_reg['Fecha'] - df_reg['Fecha'].min()).dt.days
 
 if len(df_reg) > 1:
     X = df_reg[['Dias_Desde_Inicio']].values
-    y = df_reg['Puntaje_Promedio'].values
+    y = df_reg['Puntaje_Filtrado'].values
     
     model = LinearRegression()
     model.fit(X, y)
@@ -501,7 +530,7 @@ st.markdown("---")
 st.header("🏫 Comparación entre Colegios")
 
 # Promedio general por colegio
-promedio_colegios = df_filtrado.groupby('1.  Selecciona tu colegio:')['Puntaje_Promedio'].agg([
+promedio_colegios = df_filtrado.groupby('1.  Selecciona tu colegio:')['Puntaje_Filtrado'].agg([
     ('Promedio', 'mean'),
     ('Desv_Std', 'std'),
     ('N_Estudiantes', 'count')
@@ -534,6 +563,262 @@ plt.tight_layout()
 st.pyplot(fig)
 
 st.dataframe(promedio_colegios, use_container_width=True)
+
+# ==================== F2: ANÁLISIS DE DOCENTES ====================
+st.header("👨‍🏫 F2: Análisis de Aplicaciones por Docentes")
+
+st.markdown("""
+Este análisis muestra cuántas veces cada docente ha aplicado la metodología de aprendizaje cooperativo.
+El "Número de semana de aplicación" indica el total de aplicaciones realizadas.
+""")
+
+# Cargar datos F2
+@st.cache_data
+def cargar_datos_f2():
+    sheet_id = '12JoLMA_A_-MuLqxbTTEsmBPVBhNSNbllyAlaThO2HDc'
+    gid = '1961154565'
+    url = f'https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=csv&gid={gid}'
+    
+    df_f2 = pd.read_csv(url)
+    df_f2.columns = df_f2.columns.str.strip()
+    
+    # Renombrar columnas
+    col_mapping = {
+        df_f2.columns[0]: 'Marca_Temporal',
+        df_f2.columns[1]: 'Nombre_Docente',
+        df_f2.columns[2]: 'Semana_Aplicacion',
+        df_f2.columns[3]: 'Colegio',
+        df_f2.columns[4]: 'Nivel',
+        df_f2.columns[5]: 'Paralelo',
+        df_f2.columns[6]: 'Metodologia'
+    }
+    df_f2 = df_f2.rename(columns=col_mapping)
+    
+    # Asegurar que Semana_Aplicacion sea numérico
+    df_f2['Semana_Aplicacion'] = pd.to_numeric(df_f2['Semana_Aplicacion'], errors='coerce')
+    
+    # Crear claves compuestas
+    df_f2['Curso'] = df_f2['Colegio'] + '_' + df_f2['Nivel'] + '_' + df_f2['Paralelo']
+    df_f2['Colegio_Nivel'] = df_f2['Colegio'] + '_' + df_f2['Nivel']
+    
+    return df_f2
+
+try:
+    df_f2 = cargar_datos_f2()
+    st.success(f"✅ Datos F2 cargados: {df_f2.shape[0]} registros de aplicaciones")
+    
+    # Análisis por Docente
+    st.subheader("📊 Tabla 1: Aplicaciones por Docente")
+    
+    aplicaciones_por_docente = df_f2.groupby('Nombre_Docente').agg({
+        'Semana_Aplicacion': 'max',
+        'Colegio': lambda x: ', '.join(x.unique()),
+        'Curso': 'nunique',
+        'Metodologia': 'nunique'
+    }).reset_index()
+    
+    aplicaciones_por_docente.columns = ['Docente', 'Total_Aplicaciones', 'Colegios', 'Cursos_Diferentes', 'Metodologias_Diferentes']
+    aplicaciones_por_docente = aplicaciones_por_docente.sort_values('Total_Aplicaciones', ascending=False)
+    
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:
+        st.metric("Total Docentes", len(aplicaciones_por_docente))
+    with col2:
+        st.metric("Promedio Aplicaciones", f"{aplicaciones_por_docente['Total_Aplicaciones'].mean():.1f}")
+    with col3:
+        st.metric("Máximo", int(aplicaciones_por_docente['Total_Aplicaciones'].max()))
+    with col4:
+        st.metric("Mínimo", int(aplicaciones_por_docente['Total_Aplicaciones'].min()))
+    
+    st.dataframe(aplicaciones_por_docente, use_container_width=True, hide_index=True)
+    
+    # Análisis por Curso
+    st.subheader("📊 Tabla 2: Aplicaciones por Curso")
+    
+    aplicaciones_por_curso = df_f2.groupby(['Colegio', 'Nivel', 'Paralelo']).agg({
+        'Nombre_Docente': 'nunique',
+        'Semana_Aplicacion': 'max',
+        'Metodologia': 'nunique'
+    }).reset_index()
+    
+    aplicaciones_por_curso.columns = ['Colegio', 'Nivel', 'Paralelo', 'Docentes_Diferentes', 'Total_Aplicaciones', 'Metodologias_Diferentes']
+    aplicaciones_por_curso = aplicaciones_por_curso.sort_values('Total_Aplicaciones', ascending=False)
+    
+    st.dataframe(aplicaciones_por_curso, use_container_width=True, hide_index=True)
+    
+    # Análisis por Nivel
+    st.subheader("📊 Tabla 3: Aplicaciones por Nivel")
+    
+    aplicaciones_por_nivel = df_f2.groupby(['Colegio', 'Nivel']).agg({
+        'Nombre_Docente': 'nunique',
+        'Semana_Aplicacion': 'max',
+        'Paralelo': 'nunique',
+        'Metodologia': 'nunique'
+    }).reset_index()
+    
+    aplicaciones_por_nivel.columns = ['Colegio', 'Nivel', 'Docentes_Diferentes', 'Total_Aplicaciones', 'Paralelos_Diferentes', 'Metodologias_Diferentes']
+    aplicaciones_por_nivel = aplicaciones_por_nivel.sort_values('Total_Aplicaciones', ascending=False)
+    
+    st.dataframe(aplicaciones_por_nivel, use_container_width=True, hide_index=True)
+    
+    # Análisis por Colegio
+    st.subheader("📊 Tabla 4: Aplicaciones por Colegio")
+    
+    aplicaciones_por_colegio = df_f2.groupby('Colegio').agg({
+        'Nombre_Docente': 'nunique',
+        'Semana_Aplicacion': 'max',
+        'Nivel': 'nunique',
+        'Curso': 'nunique',
+        'Metodologia': 'nunique'
+    }).reset_index()
+    
+    aplicaciones_por_colegio.columns = ['Colegio', 'Docentes_Diferentes', 'Total_Aplicaciones', 'Niveles_Diferentes', 'Cursos_Diferentes', 'Metodologias_Diferentes']
+    aplicaciones_por_colegio = aplicaciones_por_colegio.sort_values('Total_Aplicaciones', ascending=False)
+    
+    st.dataframe(aplicaciones_por_colegio, use_container_width=True, hide_index=True)
+    
+    # Gráfico de aplicaciones por docente
+    st.subheader("📈 Visualización: Top 15 Docentes")
+    
+    top_15_docentes = aplicaciones_por_docente.head(15)
+    
+    fig, ax = plt.subplots(figsize=(12, 8))
+    fig.patch.set_facecolor('white')
+    
+    bars = ax.barh(range(len(top_15_docentes)), top_15_docentes['Total_Aplicaciones'], 
+                   color='steelblue', alpha=0.8, edgecolor='white')
+    ax.set_yticks(range(len(top_15_docentes)))
+    ax.set_yticklabels(top_15_docentes['Docente'])
+    ax.set_xlabel('Total de Aplicaciones', fontweight='bold')
+    ax.set_title('Top 15 Docentes por Aplicaciones de Metodología', fontweight='bold', pad=15)
+    ax.grid(True, alpha=0.3, axis='x')
+    ax.invert_yaxis()
+    
+    # Añadir valores en las barras
+    for i, val in enumerate(top_15_docentes['Total_Aplicaciones']):
+        ax.text(val, i, f' {int(val)}', va='center', fontweight='bold')
+    
+    plt.tight_layout()
+    st.pyplot(fig)
+    
+except Exception as e:
+    st.error(f"❌ Error al cargar datos F2: {e}")
+
+st.markdown("---")
+
+# ==================== F3: ANÁLISIS DE OBSERVACIÓN ====================
+st.header("🔍 F3: Datos de Observación")
+
+st.markdown("""
+Esta sección muestra los datos de observación de la metodología de aprendizaje cooperativo.
+""")
+
+# Cargar datos F3
+@st.cache_data
+def cargar_datos_f3():
+    sheet_id = '12JoLMA_A_-MuLqxbTTEsmBPVBhNSNbllyAlaThO2HDc'
+    gid = '672136638'
+    url = f'https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=csv&gid={gid}'
+    
+    df_f3 = pd.read_csv(url)
+    df_f3.columns = df_f3.columns.str.strip()
+    
+    return df_f3
+
+try:
+    df_f3 = cargar_datos_f3()
+    st.success(f"✅ Datos F3 cargados: {df_f3.shape[0]} registros, {df_f3.shape[1]} columnas")
+    
+    # Resumen de datos
+    st.subheader("📊 Resumen de Datos F3")
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        st.metric("Total de Observaciones", len(df_f3))
+    with col2:
+        st.metric("Total de Columnas", len(df_f3.columns))
+    
+    # Mostrar información de columnas
+    with st.expander("📋 Ver información de columnas"):
+        info_columnas = pd.DataFrame({
+            'Columna': df_f3.columns,
+            'Tipo': df_f3.dtypes.values,
+            'Valores Únicos': [df_f3[col].nunique() for col in df_f3.columns],
+            'Nulos': [df_f3[col].isnull().sum() for col in df_f3.columns]
+        })
+        st.dataframe(info_columnas, use_container_width=True, hide_index=True)
+    
+    # Tabla completa de datos
+    st.subheader("📋 Tabla Completa de Observaciones")
+    
+    # Configurar display de pandas
+    pd.set_option('display.max_columns', None)
+    
+    st.dataframe(df_f3, use_container_width=True, hide_index=True)
+    
+    # Análisis de frecuencias por categorías
+    st.subheader("📊 Análisis de Frecuencias")
+    
+    # Identificar columnas categóricas
+    columnas_categoricas = []
+    for col in df_f3.columns:
+        if df_f3[col].dtype == 'object' or df_f3[col].nunique() < 20:
+            columnas_categoricas.append(col)
+    
+    if len(columnas_categoricas) > 0:
+        col_seleccionada = st.selectbox(
+            "Seleccionar columna para análisis de frecuencias:",
+            options=columnas_categoricas[:10]  # Primeras 10 columnas categóricas
+        )
+        
+        if col_seleccionada:
+            frecuencias = df_f3[col_seleccionada].value_counts()
+            
+            col1, col2 = st.columns([2, 1])
+            
+            with col1:
+                fig, ax = plt.subplots(figsize=(10, 6))
+                fig.patch.set_facecolor('white')
+                
+                if len(frecuencias) <= 15:
+                    bars = ax.bar(range(len(frecuencias)), frecuencias.values, 
+                                 color='coral', alpha=0.8, edgecolor='white')
+                    ax.set_xticks(range(len(frecuencias)))
+                    ax.set_xticklabels(frecuencias.index, rotation=45, ha='right')
+                else:
+                    # Solo mostrar top 15
+                    top_15 = frecuencias.head(15)
+                    bars = ax.bar(range(len(top_15)), top_15.values, 
+                                 color='coral', alpha=0.8, edgecolor='white')
+                    ax.set_xticks(range(len(top_15)))
+                    ax.set_xticklabels(top_15.index, rotation=45, ha='right')
+                
+                ax.set_ylabel('Frecuencia', fontweight='bold')
+                ax.set_title(f'Distribución de: {col_seleccionada}', fontweight='bold', pad=15)
+                ax.grid(True, alpha=0.3, axis='y')
+                
+                plt.tight_layout()
+                st.pyplot(fig)
+            
+            with col2:
+                st.dataframe(frecuencias.to_frame('Frecuencia'), use_container_width=True)
+    
+    # Opción para exportar datos
+    st.subheader("💾 Exportar Datos")
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        csv = df_f3.to_csv(index=False).encode('utf-8')
+        st.download_button(
+            label="⬇️ Descargar CSV",
+            data=csv,
+            file_name="f3_observacion.csv",
+            mime="text/csv",
+        )
+    
+except Exception as e:
+    st.error(f"❌ Error al cargar datos F3: {e}")
 
 # Footer
 st.markdown("---")
