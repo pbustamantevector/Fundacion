@@ -157,6 +157,7 @@ with tab1:
             "Colegios:",
             options=colegios,
             default=[],
+            placeholder="Elegir opciones",
             key="colegios_f1"
         )
 
@@ -165,6 +166,7 @@ with tab1:
             "Niveles:",
             options=niveles,
             default=[],
+            placeholder="Elegir opciones",
             key="niveles_f1"
         )
 
@@ -173,6 +175,7 @@ with tab1:
             "Paralelos:",
             options=paralelos,
             default=[],
+            placeholder="Elegir opciones",
             key="paralelos_f1"
         )
     
@@ -181,15 +184,14 @@ with tab1:
             "Dimensiones:",
             options=dims,
             default=[],
+            placeholder="Elegir opciones",
             key="dimensiones_f1",
             help="Deja vacío para mostrar promedio general de las 7 dimensiones"
         )
 
-    col5, col6 = st.columns(2)
-    with col5:
-        n_cursos = st.slider("Top Cursos a mostrar:", min_value=1, max_value=30, value=10, step=1, key="n_cursos_f1")
-    with col6:
-        n_niveles = st.slider("Top Niveles a mostrar:", min_value=1, max_value=40, value=15, step=1, key="n_niveles_f1")
+    # Valores fijos para cantidad de cursos y niveles a mostrar
+    n_cursos = 10
+    n_niveles = 15
 
     # Aplicar filtros
     df_filtrado = df.copy()
@@ -251,6 +253,9 @@ with tab1:
             axes[0, 0].grid(True, alpha=0.3, axis='y')
             axes[0, 0].tick_params(axis='x', rotation=45)
             axes[0, 0].set_ylim(1, 5)
+            # Formatear fechas sin hora
+            labels = [label.get_text()[:10] if len(label.get_text()) > 10 else label.get_text() for label in axes[0, 0].get_xticklabels()]
+            axes[0, 0].set_xticklabels(labels)
         
         # GRÁFICO 2: Desviación estándar por curso
         pivot_std_curso = agrupado_curso[agrupado_curso['Curso'].isin(top_cursos)].pivot(
@@ -265,6 +270,9 @@ with tab1:
             axes[0, 1].legend(bbox_to_anchor=(1.02, 1), loc='upper left', fontsize=7, title='Cursos')
             axes[0, 1].grid(True, alpha=0.3, axis='y')
             axes[0, 1].tick_params(axis='x', rotation=45)
+            # Formatear fechas sin hora
+            labels = [label.get_text()[:10] if len(label.get_text()) > 10 else label.get_text() for label in axes[0, 1].get_xticklabels()]
+            axes[0, 1].set_xticklabels(labels)
         
         # GRÁFICO 3: Evolución del puntaje promedio por nivel
         pivot_nivel = agrupado_nivel[agrupado_nivel['Nivel'].isin(top_niveles)].pivot(
@@ -280,6 +288,9 @@ with tab1:
             axes[1, 0].grid(True, alpha=0.3, axis='y')
             axes[1, 0].tick_params(axis='x', rotation=45)
             axes[1, 0].set_ylim(1, 5)
+            # Formatear fechas sin hora
+            labels = [label.get_text()[:10] if len(label.get_text()) > 10 else label.get_text() for label in axes[1, 0].get_xticklabels()]
+            axes[1, 0].set_xticklabels(labels)
         
         # GRÁFICO 4: Desviación estándar por nivel
         pivot_std_nivel = agrupado_nivel[agrupado_nivel['Nivel'].isin(top_niveles)].pivot(
@@ -294,6 +305,9 @@ with tab1:
             axes[1, 1].legend(bbox_to_anchor=(1.02, 1), loc='upper left', fontsize=7, title='Niveles')
             axes[1, 1].grid(True, alpha=0.3, axis='y')
             axes[1, 1].tick_params(axis='x', rotation=45)
+            # Formatear fechas sin hora
+            labels = [label.get_text()[:10] if len(label.get_text()) > 10 else label.get_text() for label in axes[1, 1].get_xticklabels()]
+            axes[1, 1].set_xticklabels(labels)
         
         plt.tight_layout()
         st.pyplot(fig)
