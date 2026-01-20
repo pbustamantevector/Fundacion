@@ -189,10 +189,6 @@ with tab1:
             help="Deja vacío para mostrar promedio general de las 7 dimensiones"
         )
 
-    # Valores fijos para cantidad de cursos y niveles a mostrar
-    n_cursos = 10
-    n_niveles = 15
-
     # Aplicar filtros
     df_filtrado = df.copy()
 
@@ -231,9 +227,9 @@ with tab1:
         agrupado_nivel.columns = ['Nivel', 'Mes_Año', 'Promedio', 'Desv_Std', 'N_Estudiantes']
         agrupado_nivel['Fecha_Plot'] = agrupado_nivel['Mes_Año'].dt.to_timestamp()
         
-        # Seleccionar top cursos y niveles
-        top_cursos = agrupado_curso.groupby('Curso')['N_Estudiantes'].sum().nlargest(min(n_cursos, agrupado_curso['Curso'].nunique())).index
-        top_niveles = agrupado_nivel.groupby('Nivel')['N_Estudiantes'].sum().nlargest(min(n_niveles, agrupado_nivel['Nivel'].nunique())).index
+        # Usar todos los cursos y niveles disponibles
+        top_cursos = agrupado_curso['Curso'].unique()
+        top_niveles = agrupado_nivel['Nivel'].unique()
         
         # Crear figura con 4 subgráficos
         fig, axes = plt.subplots(2, 2, figsize=(20, 12))
