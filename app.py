@@ -66,7 +66,7 @@ COLOR_NEUTRAL = '#95a5a6'
 st.title("📈 Análisis Completo de Metodología de Aprendizaje Cooperativo")
 
 # Navegación por pestañas
-tab1, tab2, tab3 = st.tabs(["📊 F1: Análisis Estudiantes", "👨‍🏫 F2: Aplicaciones Docentes", "👁️ F3: Observación"])
+tab1, tab2, tab3 = st.tabs(["F1: Análisis Estudiantes", "F2: Aplicaciones Docentes", "F3: Observación"])
 
 # ==================== TAB 1: F1 - ANÁLISIS ESTUDIANTES ====================
 with tab1:
@@ -148,7 +148,7 @@ with tab1:
         st.stop()
 
     # ==================== FILTROS INTERACTIVOS ====================
-    st.header("🔍 Filtros Interactivos")
+    st.header("Filtros por colegio, nivel, curso y dimensiones")
 
     col1, col2, col3, col4 = st.columns(4)
 
@@ -216,7 +216,7 @@ with tab1:
         st.markdown("---")
         
         # ==================== GRÁFICOS INTERACTIVOS ====================
-        st.header("📈 Gráficos Interactivos")
+        st.header("Gráficos :")
         
         # Agrupar datos por curso y nivel
         agrupado_curso = df_filtrado.groupby(['Colegio_Nivel_Paralelo', 'Mes_Año'])['Puntaje_Filtrado'].agg(['mean', 'std', 'count']).reset_index()
@@ -244,7 +244,7 @@ with tab1:
             pivot_curso.plot(kind='bar', ax=axes[0, 0], alpha=0.85, width=0.8, edgecolor='white', linewidth=0.5)
             axes[0, 0].set_xlabel('Mes', fontweight='bold')
             axes[0, 0].set_ylabel(label_puntaje, fontweight='bold')
-            axes[0, 0].set_title(f'Evolución del Puntaje por Curso (Top {len(top_cursos)})', fontweight='bold')
+            axes[0, 0].set_title(f'Evolución del Puntaje por Curso ({len(top_cursos)} cursos)', fontweight='bold')
             axes[0, 0].legend(bbox_to_anchor=(1.02, 1), loc='upper left', fontsize=7, title='Cursos')
             axes[0, 0].grid(True, alpha=0.3, axis='y')
             axes[0, 0].tick_params(axis='x', rotation=45)
@@ -279,7 +279,7 @@ with tab1:
             pivot_nivel.plot(kind='bar', ax=axes[1, 0], alpha=0.85, width=0.8, edgecolor='white', linewidth=0.5)
             axes[1, 0].set_xlabel('Mes', fontweight='bold')
             axes[1, 0].set_ylabel(label_puntaje, fontweight='bold')
-            axes[1, 0].set_title(f'Evolución del Puntaje por Nivel (Top {len(top_niveles)})', fontweight='bold')
+            axes[1, 0].set_title(f'Evolución del Puntaje por Nivel ({len(top_niveles)} niveles)', fontweight='bold')
             axes[1, 0].legend(bbox_to_anchor=(1.02, 1), loc='upper left', fontsize=7, title='Niveles')
             axes[1, 0].grid(True, alpha=0.3, axis='y')
             axes[1, 0].tick_params(axis='x', rotation=45)
@@ -376,7 +376,7 @@ with tab2:
         st.markdown("---")
         
         # ==================== TABLA 1: APLICACIONES POR DOCENTE ====================
-        st.subheader("📊 Tabla 1: Aplicaciones por Docente")
+        st.subheader("Tabla 1: Aplicaciones por Docente")
         
         aplicaciones_por_docente = df_f2.groupby('Nombre_Docente').agg({
             'Semana_Aplicacion': 'max',
@@ -398,7 +398,7 @@ with tab2:
         st.markdown("---")
         
         # ==================== TABLA 2: APLICACIONES POR CURSO ====================
-        st.subheader("📊 Tabla 2: Aplicaciones por Curso")
+        st.subheader("Tabla 2: Aplicaciones por Curso")
         
         aplicaciones_por_curso = df_f2.groupby(['Colegio', 'Nivel', 'Paralelo']).agg({
             'Nombre_Docente': 'nunique',
@@ -418,7 +418,7 @@ with tab2:
         st.markdown("---")
         
         # ==================== TABLA 3: APLICACIONES POR NIVEL ====================
-        st.subheader("📊 Tabla 3: Aplicaciones por Nivel")
+        st.subheader("Tabla 3: Aplicaciones por Nivel")
         
         aplicaciones_por_nivel = df_f2.groupby(['Colegio', 'Nivel']).agg({
             'Nombre_Docente': 'nunique',
@@ -439,7 +439,7 @@ with tab2:
         st.markdown("---")
         
         # ==================== TABLA 4: APLICACIONES POR COLEGIO ====================
-        st.subheader("📊 Tabla 4: Aplicaciones por Colegio")
+        st.subheader("Tabla 4: Aplicaciones por Colegio")
         
         aplicaciones_por_colegio = df_f2.groupby('Colegio').agg({
             'Nombre_Docente': 'nunique',
@@ -461,7 +461,7 @@ with tab2:
         st.markdown("---")
         
         # ==================== TABLA 5: DETALLE DOCENTE X CURSO ====================
-        st.subheader("📊 Tabla 5: Detalle Docente x Curso")
+        st.subheader("Tabla 5: Detalle Docente x Curso")
         
         detalle_docente_curso = df_f2.groupby(['Nombre_Docente', 'Colegio', 'Nivel', 'Paralelo']).agg({
             'Semana_Aplicacion': 'max',
@@ -481,18 +481,7 @@ with tab2:
 
 # ==================== TAB 3: F3 - OBSERVACIÓN ====================
 with tab3:
-    st.header("Observación - Análisis en Tabla")
-    
-    # Botón para actualizar datos
-    col_titulo, col_boton = st.columns([4, 1])
-    with col_boton:
-        if st.button("🔄 Actualizar Datos F3", use_container_width=True):
-            st.cache_data.clear()
-            st.rerun()
-    
-    st.markdown("""
-    Datos de observación del proceso de aplicación de metodologías.
-    """)
+    st.header("Observación")
     
     # Cargar datos F3
     @st.cache_data
@@ -504,46 +493,13 @@ with tab3:
         df_f3 = pd.read_csv(url)
         df_f3.columns = df_f3.columns.str.strip()
         
-        import datetime
-        timestamp = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-        
-        return df_f3, timestamp
+        return df_f3
     
     try:
-        df_f3, timestamp = cargar_datos_f3()
-        st.success(f"✅ Datos F3 cargados: {df_f3.shape[0]} registros, {df_f3.shape[1]} columnas | Última actualización: {timestamp}")
+        df_f3 = cargar_datos_f3()
         
-        # Mostrar información de columnas
-        with st.expander("📋 Ver columnas disponibles"):
-            st.write("**Columnas en el dataset:**")
-            for i, col in enumerate(df_f3.columns, 1):
-                st.write(f"{i}. {col}")
-        
-        st.markdown("---")
-        
-        # Mostrar tabla completa
-        st.subheader("📊 Datos de Observación F3")
-        st.dataframe(df_f3, use_container_width=True, height=600)
-        
-        # Mostrar estadísticas básicas
-        if len(df_f3) > 0:
-            st.markdown("---")
-            st.subheader("📈 Estadísticas Básicas")
-            
-            # Intentar identificar columnas numéricas
-            numeric_cols = df_f3.select_dtypes(include=[np.number]).columns.tolist()
-            
-            if len(numeric_cols) > 0:
-                st.write("**Columnas numéricas:**")
-                st.dataframe(df_f3[numeric_cols].describe(), use_container_width=True)
-            
-            # Mostrar información de columnas categóricas
-            categorical_cols = df_f3.select_dtypes(include=['object']).columns.tolist()
-            
-            if len(categorical_cols) > 0:
-                st.write("**Valores únicos por columna categórica:**")
-                unique_counts = {col: df_f3[col].nunique() for col in categorical_cols}
-                st.write(unique_counts)
+        # Mostrar solo la tabla
+        st.dataframe(df_f3, use_container_width=True, height=700)
         
     except Exception as e:
         st.error(f"❌ Error al cargar datos F3: {e}")
